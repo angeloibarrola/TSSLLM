@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Save, FileText, Eye, Pencil, Loader2 } from "lucide-react";
+import { Plus, Trash2, Save, FileText, Eye, Pencil, Loader2, Mail } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { api } from "../../api/client";
 import type { Artifact, Source } from "../../types";
@@ -184,6 +184,17 @@ export function StudioPane({ selectedSourceId, onClearSource, pendingArtifactId,
                 <Save size={14} />
               </button>
             )}
+            <button
+              onClick={() => {
+                const subject = encodeURIComponent(title || "Note");
+                const body = encodeURIComponent(content);
+                window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+              }}
+              className="p-1 text-gray-400 hover:text-gray-200"
+              title="Send as Email"
+            >
+              <Mail size={14} />
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             {editing ? (
