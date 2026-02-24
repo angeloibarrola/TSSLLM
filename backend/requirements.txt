@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+python-docx
+numpy
+openai
+beautifulsoup4
+httpx
+python-dotenv
+python-multipart
+pydantic-settings
+msal
