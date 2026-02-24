@@ -22,7 +22,7 @@ class ChatService:
         return db.query(ChatMessage).order_by(ChatMessage.created_at.asc()).all()
 
     @classmethod
-    def send_message(cls, db: Session, user_content: str) -> ChatMessage:
+    def send_message(cls, db: Session, user_content: str, source_ids: list[int] | None = None) -> ChatMessage:
         # Save user message
         user_msg = ChatMessage(role="user", content=user_content)
         db.add(user_msg)
@@ -30,7 +30,7 @@ class ChatService:
         db.refresh(user_msg)
 
         # Retrieve relevant context from sources
-        contexts = EmbeddingService.query(user_content, n_results=5)
+        contexts = EmbeddingService.query(user_content, n_results=5, source_ids=source_ids)
 
         # Build system prompt with context
         if contexts:

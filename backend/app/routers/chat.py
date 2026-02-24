@@ -13,6 +13,6 @@ def list_messages(db: Session = Depends(get_db)):
 @router.post("", response_model=ChatMessageResponse)
 def send_message(data: ChatRequest, db: Session = Depends(get_db)):
     try:
-        return ChatService.send_message(db, data.content)
+        return ChatService.send_message(db, data.content, data.source_ids)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")

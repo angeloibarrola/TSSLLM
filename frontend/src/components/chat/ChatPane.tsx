@@ -3,7 +3,7 @@ import { Send, Loader2 } from "lucide-react";
 import { api } from "../../api/client";
 import type { ChatMessage } from "../../types";
 
-export function ChatPane() {
+export function ChatPane({ enabledSourceIds }: { enabledSourceIds: Set<number> }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,8 @@ export function ChatPane() {
     setLoading(true);
 
     try {
-      await api.sendMessage(userContent);
+      const sourceIds = enabledSourceIds.size > 0 ? Array.from(enabledSourceIds) : undefined;
+      await api.sendMessage(userContent, sourceIds);
       // Refresh all messages to get proper IDs
       const updated = await api.getMessages();
       setMessages(updated);

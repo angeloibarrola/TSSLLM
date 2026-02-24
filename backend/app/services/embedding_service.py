@@ -79,15 +79,21 @@ class EmbeddingService:
         cls._save_store()
 
     @classmethod
-    def query(cls, query_text: str, n_results: int = 5) -> list[dict]:
+    def query(cls, query_text: str, n_results: int = 5, source_ids: list[int] | None = None) -> list[dict]:
         store = cls._load_store()
         if not store:
+            return []
+        # Filter by source_ids if provided
+        candidates = store
+        if source_ids is not None:
+            candidates = [e for e in store if e["metadata"]["source_id"] in source_ids]
+        if not candidates:
             return []
         query_emb = cls._embed([query_text])[0]
         query_vec = np.array(query_emb)
         # Cosine similarity
         scored = []
-        for entry in store:
+        for entry in candidates:
             entry_vec = np.array(entry["embedding"])
             sim = float(np.dot(query_vec, entry_vec) / (np.linalg.norm(query_vec) * np.linalg.norm(entry_vec) + 1e-10))
             scored.append((sim, entry))

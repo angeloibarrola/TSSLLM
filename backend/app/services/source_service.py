@@ -19,16 +19,35 @@ class SourceService:
         text = re.sub(r"NOTE\b[^\n]*\n(?:[^\n]+\n)*\n?", "", text)
         # Remove STYLE blocks
         text = re.sub(r"STYLE\b[^\n]*\n(?:[^\n]+\n)*\n?", "", text)
-        # Remove cue identifiers (standalone lines before timestamps)
         # Remove timestamp lines like "00:00:00.000 --> 00:00:05.000" with optional settings
         text = re.sub(r"^[^\n]*\d{2}:\d{2}[\d:.]*\s*-->\s*\d{2}:\d{2}[\d:.]*[^\n]*$", "", text, flags=re.MULTILINE)
-        # Remove numeric cue IDs (standalone numbers on a line)
+        # Remove cue IDs (GUIDs or standalone numbers)
+        text = re.sub(r"^[a-f0-9\-]+/\d+-\d+\s*$", "", text, flags=re.MULTILINE)
         text = re.sub(r"^\d+\s*$", "", text, flags=re.MULTILINE)
-        # Strip HTML-like tags (e.g. <v Speaker>, <b>, etc.)
+        # Convert voice tags <v Speaker Name>text</v> → "Speaker Name: text"
+        text = re.sub(r"<v\s+([^>]+)>", r"\1: ", text)
+        # Strip remaining HTML-like tags (</v>, <b>, etc.)
         text = re.sub(r"<[^>]+>", "", text)
-        # Collapse multiple blank lines and clean up
+        # Collapse blank lines and clean up
         lines = [line.strip() for line in text.splitlines() if line.strip()]
-        return "\n\n".join(lines)
+        # Merge continuation lines and consecutive lines from the same speaker
+        merged: list[str] = []
+        for line in lines:
+            if not merged:
+                merged.append(line)
+                continue
+            prev = merged[-1]
+            if ": " in line:
+                curr_speaker = line.split(": ", 1)[0]
+                if ": " in prev and prev.split(": ", 1)[0] == curr_speaker:
+                    # Same speaker — append just the text
+                    merged[-1] += " " + line.split(": ", 1)[1]
+                else:
+                    merged.append(line)
+            else:
+                # Continuation line (no speaker prefix) — append to previous
+                merged[-1] += " " + line
+        return "\n\n".join(merged)
 
     @staticmethod
     def parse_docx(file_path: str) -> str:

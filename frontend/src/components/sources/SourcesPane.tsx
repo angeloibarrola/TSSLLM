@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
-import { FileUp, Globe, Trash2, Loader2, ClipboardPaste, X } from "lucide-react";
+import { FileUp, Globe, Trash2, Loader2, ClipboardPaste, X, CheckSquare, Square } from "lucide-react";
 import { api } from "../../api/client";
 import type { Source } from "../../types";
 
-export function SourcesPane({ onSelectSource, selectedSourceId }: { onSelectSource: (id: number) => void; selectedSourceId: number | null }) {
+interface SourcesPaneProps {
+  onSelectSource: (id: number) => void;
+  selectedSourceId: number | null;
+  enabledSourceIds: Set<number>;
+  onToggleSource: (id: number) => void;
+  onSourcesChanged: (sourceIds: number[]) => void;
+}
+
+export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds, onToggleSource, onSourcesChanged }: SourcesPaneProps) {
   const [sources, setSources] = useState<Source[]>([]);
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,6 +25,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId }: { onSelectSour
     try {
       const data = await api.getSources();
       setSources(data);
+      onSourcesChanged(data.map((s) => s.id));
     } catch {
       /* ignore */
     }
@@ -78,7 +87,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId }: { onSelectSour
   const handleDelete = async (id: number) => {
     try {
       await api.deleteSource(id);
-      setSources((prev) => prev.filter((s) => s.id !== id));
+      await fetchSources();
     } catch {
       /* ignore */
     }
@@ -181,16 +190,22 @@ export function SourcesPane({ onSelectSource, selectedSourceId }: { onSelectSour
         {sources.map((source) => (
           <div
             key={source.id}
-            onClick={() => onSelectSource(source.id)}
             className={`flex items-center gap-2 p-2 rounded-lg hover:bg-gray-800/50 cursor-pointer group ${selectedSourceId === source.id ? "bg-gray-800 ring-1 ring-blue-500/50" : ""}`}
           >
-            <span className="text-lg">{sourceIcon(source.source_type)}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{source.name}</p>
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleSource(source.id); }}
+              className="text-gray-400 hover:text-blue-400 transition-colors flex-shrink-0"
+              title={enabledSourceIds.has(source.id) ? "Disable for chat" : "Enable for chat"}
+            >
+              {enabledSourceIds.has(source.id) ? <CheckSquare size={16} className="text-blue-500" /> : <Square size={16} />}
+            </button>
+            <div className="flex-1 min-w-0" onClick={() => onSelectSource(source.id)}>
+              <span className="text-lg mr-1">{sourceIcon(source.source_type)}</span>
+              <span className="text-sm font-medium">{source.name}</span>
               <p className="text-xs text-gray-500">{source.source_type}</p>
             </div>
             <button
-              onClick={() => handleDelete(source.id)}
+              onClick={(e) => { e.stopPropagation(); handleDelete(source.id); }}
               className="p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
             >
               <Trash2 size={14} />

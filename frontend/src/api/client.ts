@@ -66,10 +66,10 @@ export const api = {
 
   // Chat
   getMessages: () => request<import("../types").ChatMessage[]>("/api/chat"),
-  sendMessage: (content: string) =>
+  sendMessage: (content: string, source_ids?: number[]) =>
     request<import("../types").ChatMessage>("/api/chat", {
       method: "POST",
-      body: JSON.stringify({ content }),
+      body: JSON.stringify({ content, source_ids }),
     }),
 
   // Artifacts
