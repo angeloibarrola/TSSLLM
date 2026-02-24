@@ -8,10 +8,11 @@ interface SourcesPaneProps {
   selectedSourceId: number | null;
   enabledSourceIds: Set<number>;
   onToggleSource: (id: number) => void;
+  onSetAllSources: (ids: number[]) => void;
   onSourcesChanged: (sourceIds: number[]) => void;
 }
 
-export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds, onToggleSource, onSourcesChanged }: SourcesPaneProps) {
+export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds, onToggleSource, onSetAllSources, onSourcesChanged }: SourcesPaneProps) {
   const [sources, setSources] = useState<Source[]>([]);
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -184,6 +185,23 @@ export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds
 
       {/* Source List */}
       <div className="flex-1 overflow-y-auto p-2">
+        {sources.length > 0 && (
+          <button
+            onClick={() => {
+              const allEnabled = sources.every((s) => enabledSourceIds.has(s.id));
+              onSetAllSources(allEnabled ? [] : sources.map((s) => s.id));
+            }}
+            className="flex items-center gap-2 w-full px-2 py-1.5 mb-1 text-xs text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 rounded transition-colors"
+          >
+            {sources.every((s) => enabledSourceIds.has(s.id))
+              ? <CheckSquare size={14} className="text-blue-500" />
+              : sources.some((s) => enabledSourceIds.has(s.id))
+                ? <Square size={14} className="text-blue-500/50" />
+                : <Square size={14} />
+            }
+            {sources.every((s) => enabledSourceIds.has(s.id)) ? "Deselect all" : "Select all"}
+          </button>
+        )}
         {sources.length === 0 && !loading && (
           <p className="text-gray-500 text-sm text-center mt-8">No sources yet. Upload a document or add a URL.</p>
         )}
