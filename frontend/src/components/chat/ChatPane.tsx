@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, BookmarkPlus } from "lucide-react";
 import { api } from "../../api/client";
 import type { ChatMessage } from "../../types";
 
-export function ChatPane({ enabledSourceIds }: { enabledSourceIds: Set<number> }) {
+export function ChatPane({ enabledSourceIds, onSaveToNote }: { enabledSourceIds: Set<number>; onSaveToNote: (content: string) => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,7 +70,7 @@ export function ChatPane({ enabledSourceIds }: { enabledSourceIds: Set<number> }
           </div>
         )}
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div key={msg.id} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
             <div
               className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === "user"
@@ -85,6 +85,15 @@ export function ChatPane({ enabledSourceIds }: { enabledSourceIds: Set<number> }
                 </div>
               )}
             </div>
+            {msg.role === "assistant" && (
+              <button
+                onClick={() => onSaveToNote(msg.content)}
+                className="mt-1 flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors"
+              >
+                <BookmarkPlus size={12} />
+                Save to Note
+              </button>
+            )}
           </div>
         ))}
         {loading && (

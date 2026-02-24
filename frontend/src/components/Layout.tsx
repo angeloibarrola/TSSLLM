@@ -2,11 +2,20 @@ import { useState, useRef } from "react";
 import { SourcesPane } from "./sources/SourcesPane";
 import { ChatPane } from "./chat/ChatPane";
 import { StudioPane } from "./studio/StudioPane";
+import { api } from "../api/client";
 
 export function Layout() {
   const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
   const [enabledSourceIds, setEnabledSourceIds] = useState<Set<number>>(new Set());
+  const [pendingArtifactId, setPendingArtifactId] = useState<number | null>(null);
   const allKnownIds = useRef<Set<number>>(new Set());
+
+  const handleSaveToNote = async (content: string) => {
+    const title = content.slice(0, 50).replace(/\n/g, " ").trim() || "Chat Note";
+    const artifact = await api.createArtifact(title, content);
+    setSelectedSourceId(null);
+    setPendingArtifactId(artifact.id);
+  };
 
   const toggleSourceEnabled = (id: number) => {
     setEnabledSourceIds((prev) => {
@@ -59,10 +68,10 @@ export function Layout() {
           />
         </div>
         <div className="flex-1 flex flex-col min-w-0">
-          <ChatPane enabledSourceIds={enabledSourceIds} />
+          <ChatPane enabledSourceIds={enabledSourceIds} onSaveToNote={handleSaveToNote} />
         </div>
         <div className="w-96 border-l border-gray-800 flex flex-col">
-          <StudioPane selectedSourceId={selectedSourceId} onClearSource={() => setSelectedSourceId(null)} />
+          <StudioPane selectedSourceId={selectedSourceId} onClearSource={() => setSelectedSourceId(null)} pendingArtifactId={pendingArtifactId} onClearPending={() => setPendingArtifactId(null)} />
         </div>
       </div>
     </div>

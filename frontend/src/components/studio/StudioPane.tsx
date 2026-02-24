@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { api } from "../../api/client";
 import type { Artifact, Source } from "../../types";
 
-export function StudioPane({ selectedSourceId, onClearSource }: { selectedSourceId: number | null; onClearSource: () => void }) {
+export function StudioPane({ selectedSourceId, onClearSource, pendingArtifactId, onClearPending }: { selectedSourceId: number | null; onClearSource: () => void; pendingArtifactId?: number | null; onClearPending?: () => void }) {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [selected, setSelected] = useState<Artifact | null>(null);
   const [editing, setEditing] = useState(false);
@@ -25,6 +25,22 @@ export function StudioPane({ selectedSourceId, onClearSource }: { selectedSource
   };
 
   useEffect(() => { fetchArtifacts(); }, []);
+
+  // Auto-select a newly created artifact from chat
+  useEffect(() => {
+    if (pendingArtifactId == null) return;
+    fetchArtifacts().then(() => {
+      api.getArtifacts().then((data) => {
+        const target = data.find((a) => a.id === pendingArtifactId);
+        if (target) {
+          setArtifacts(data);
+          selectArtifact(target);
+          setEditing(true);
+        }
+      });
+    });
+    onClearPending?.();
+  }, [pendingArtifactId]);
 
   // Fetch source content when a source is selected
   useEffect(() => {
