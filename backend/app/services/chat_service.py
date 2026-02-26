@@ -41,7 +41,7 @@ class ChatService:
         db.refresh(user_msg)
 
         # Retrieve relevant context from sources
-        contexts = EmbeddingService.query(user_content, n_results=5, source_ids=source_ids, workspace_id=workspace_id)
+        contexts = EmbeddingService.query(user_content, n_results=15, source_ids=source_ids, workspace_id=workspace_id)
 
         # Build system prompt with context
         if contexts:
@@ -86,7 +86,7 @@ class ChatService:
             model=settings.chat_model,
             messages=messages,
             temperature=0.3,
-            max_tokens=2000,
+            max_tokens=4000,
         )
 
         assistant_content = response.choices[0].message.content

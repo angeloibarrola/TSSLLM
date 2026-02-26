@@ -57,7 +57,7 @@ class EmbeddingService:
         return chunks
 
     @classmethod
-    def add_source(cls, source_id: int, source_name: str, text: str):
+    def add_source(cls, source_id: int, source_name: str, text: str, workspace_id: str = ""):
         store = cls._load_store()
         chunks = cls.chunk_text(text)
         if not chunks:
@@ -65,10 +65,10 @@ class EmbeddingService:
         embeddings = cls._embed(chunks)
         for i, (chunk, emb) in enumerate(zip(chunks, embeddings)):
             store.append({
-                "id": f"source-{source_id}-chunk-{i}",
+                "id": f"ws-{workspace_id}-source-{source_id}-chunk-{i}",
                 "text": chunk,
                 "embedding": emb,
-                "metadata": {"source_id": source_id, "source_name": source_name, "chunk_index": i},
+                "metadata": {"source_id": source_id, "source_name": source_name, "chunk_index": i, "workspace_id": workspace_id},
             })
         cls._save_store()
 
@@ -79,14 +79,17 @@ class EmbeddingService:
         cls._save_store()
 
     @classmethod
-    def query(cls, query_text: str, n_results: int = 5, source_ids: list[int] | None = None) -> list[dict]:
+    def query(cls, query_text: str, n_results: int = 15, source_ids: list[int] | None = None, workspace_id: str | None = None) -> list[dict]:
         store = cls._load_store()
         if not store:
             return []
-        # Filter by source_ids if provided
         candidates = store
+        # Filter by workspace_id to prevent cross-notebook leakage
+        if workspace_id is not None:
+            candidates = [e for e in candidates if e["metadata"].get("workspace_id") == workspace_id]
+        # Filter by source_ids if provided
         if source_ids is not None:
-            candidates = [e for e in store if e["metadata"]["source_id"] in source_ids]
+            candidates = [e for e in candidates if e["metadata"]["source_id"] in source_ids]
         if not candidates:
             return []
         query_emb = cls._embed([query_text])[0]
@@ -98,8 +101,28 @@ class EmbeddingService:
             sim = float(np.dot(query_vec, entry_vec) / (np.linalg.norm(query_vec) * np.linalg.norm(entry_vec) + 1e-10))
             scored.append((sim, entry))
         scored.sort(key=lambda x: x[0], reverse=True)
+
+        # Ensure per-source coverage: pick top chunk from each source first
+        seen_sources: set[int] = set()
+        guaranteed: list[tuple[float, dict]] = []
+        remaining: list[tuple[float, dict]] = []
+        for sim, entry in scored:
+            src_id = entry["metadata"]["source_id"]
+            if src_id not in seen_sources:
+                seen_sources.add(src_id)
+                guaranteed.append((sim, entry))
+            else:
+                remaining.append((sim, entry))
+
+        # Fill up to n_results: guaranteed first, then remaining by similarity
+        selected = guaranteed[:n_results]
+        for item in remaining:
+            if len(selected) >= n_results:
+                break
+            selected.append(item)
+
         results = []
-        for sim, entry in scored[:n_results]:
+        for sim, entry in selected:
             results.append({
                 "id": entry["id"],
                 "text": entry["text"],
