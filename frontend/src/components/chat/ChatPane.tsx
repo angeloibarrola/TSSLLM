@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Loader2, BookmarkPlus, Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import type { Api } from "../../api/client";
 import type { ChatMessage } from "../../types";
 
@@ -111,13 +112,19 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
         {messages.map((msg) => (
           <div key={msg.id} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
             <div
-              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 msg.role === "user"
-                  ? "bg-blue-600 text-white rounded-br-md"
+                  ? "bg-blue-600 text-white rounded-br-md whitespace-pre-wrap"
                   : "bg-gray-800 text-gray-100 rounded-bl-md"
               }`}
             >
-              {msg.content}
+              {msg.role === "assistant" ? (
+                <div className="prose prose-invert prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-pre:my-2 prose-code:text-blue-300 prose-a:text-blue-400">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
+              ) : (
+                msg.content
+              )}
               {msg.sources_cited && (
                 <div className="mt-2 pt-2 border-t border-gray-700/50 text-xs text-gray-400">
                   📚 Sources: {JSON.parse(msg.sources_cited).join(", ")}
