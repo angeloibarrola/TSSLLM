@@ -1,9 +1,9 @@
 import json
-from datetime import datetime
 from openai import OpenAI
 from sqlalchemy.orm import Session
 from app.models.chat import ChatMessage
 from app.models.source import Source
+from app.models.workspace import Workspace
 from app.services.embedding_service import EmbeddingService
 from app.config import settings
 
@@ -20,14 +20,20 @@ class ChatService:
         return cls._client
 
     @classmethod
-    def get_messages(cls, db: Session, workspace_id: str, after: str | None = None) -> list[ChatMessage]:
+    def _get_reset_at(cls, db: Session, workspace_id: str):
+        ws = db.query(Workspace).filter(Workspace.id == workspace_id).first()
+        return ws.chat_reset_at if ws else None
+
+    @classmethod
+    def get_messages(cls, db: Session, workspace_id: str) -> list[ChatMessage]:
         query = db.query(ChatMessage).filter(ChatMessage.workspace_id == workspace_id)
-        if after:
-            query = query.filter(ChatMessage.created_at > datetime.fromisoformat(after))
+        reset_at = cls._get_reset_at(db, workspace_id)
+        if reset_at:
+            query = query.filter(ChatMessage.created_at > reset_at)
         return query.order_by(ChatMessage.created_at.asc()).all()
 
     @classmethod
-    def send_message(cls, db: Session, user_content: str, workspace_id: str, source_ids: list[int] | None = None, after: str | None = None) -> ChatMessage:
+    def send_message(cls, db: Session, user_content: str, workspace_id: str, source_ids: list[int] | None = None) -> ChatMessage:
         # Save user message
         user_msg = ChatMessage(role="user", content=user_content, workspace_id=workspace_id)
         db.add(user_msg)
@@ -60,8 +66,9 @@ class ChatService:
         history_query = db.query(ChatMessage).filter(
             ChatMessage.workspace_id == workspace_id
         )
-        if after:
-            history_query = history_query.filter(ChatMessage.created_at > datetime.fromisoformat(after))
+        reset_at = cls._get_reset_at(db, workspace_id)
+        if reset_at:
+            history_query = history_query.filter(ChatMessage.created_at > reset_at)
         history = history_query.order_by(ChatMessage.created_at.asc()).all()
         # Exclude the user message we just saved (it's the last one)
         history = history[:-1]

@@ -10,12 +10,11 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  const [chatResetAt, setChatResetAt] = useState<string | undefined>(undefined);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.getMessages(chatResetAt).then(setMessages).catch(() => {});
-  }, [refreshKey, chatResetAt]);
+    api.getMessages().then(setMessages).catch(() => {});
+  }, [refreshKey]);
 
   // Fetch suggestions when chat is empty and sources exist
   useEffect(() => {
@@ -36,6 +35,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
 
   const SLASH_COMMANDS: Record<string, string> = {
     "/new": "Clear the chat and start a fresh conversation",
+    "/restore": "Restore all previous messages",
     "/help": "Show available commands",
   };
 
@@ -43,8 +43,14 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
     const cmd = command.toLowerCase().trim();
 
     if (cmd === "/new") {
-      setChatResetAt(new Date().toISOString());
-      setMessages([]);
+      api.resetChat().then(() => setMessages([])).catch(() => {});
+      return true;
+    }
+
+    if (cmd === "/restore") {
+      api.restoreChat().then(() => {
+        api.getMessages().then(setMessages).catch(() => {});
+      }).catch(() => {});
       return true;
     }
 
@@ -109,9 +115,9 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
 
     try {
       const sourceIds = enabledSourceIds.size > 0 ? Array.from(enabledSourceIds) : undefined;
-      await api.sendMessage(userContent, sourceIds, chatResetAt);
+      await api.sendMessage(userContent, sourceIds);
       // Refresh all messages to get proper IDs
-      const updated = await api.getMessages(chatResetAt);
+      const updated = await api.getMessages();
       setMessages(updated);
     } catch {
       setMessages((prev) => [

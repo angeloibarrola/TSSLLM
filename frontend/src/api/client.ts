@@ -71,15 +71,16 @@ export function createApi(workspaceId: string) {
       request<void>(`${p}/sources/${id}`, { method: "DELETE" }),
 
     // Chat
-    getMessages: (after?: string) => {
-      const params = after ? `?after=${encodeURIComponent(after)}` : "";
-      return request<import("../types").ChatMessage[]>(`${p}/chat${params}`);
-    },
-    sendMessage: (content: string, source_ids?: number[], after?: string) =>
+    getMessages: () => request<import("../types").ChatMessage[]>(`${p}/chat`),
+    sendMessage: (content: string, source_ids?: number[]) =>
       request<import("../types").ChatMessage>(`${p}/chat`, {
         method: "POST",
-        body: JSON.stringify({ content, source_ids, after }),
+        body: JSON.stringify({ content, source_ids }),
       }),
+    resetChat: () =>
+      request<{ ok: boolean }>(`${p}/chat/reset`, { method: "POST" }),
+    restoreChat: () =>
+      request<{ ok: boolean }>(`${p}/chat/reset`, { method: "DELETE" }),
     getSuggestions: () =>
       request<{ suggestions: string[] }>(`${p}/chat/suggestions`).then((r) => r.suggestions),
 

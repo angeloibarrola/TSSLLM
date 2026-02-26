@@ -5,7 +5,6 @@ from typing import Optional
 class ChatRequest(BaseModel):
     content: str
     source_ids: Optional[list[int]] = None
-    after: Optional[str] = None
 
 class ChatMessageResponse(BaseModel):
     id: int
