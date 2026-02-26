@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from openai import OpenAI
 from sqlalchemy.orm import Session
 from app.models.chat import ChatMessage
@@ -19,11 +20,14 @@ class ChatService:
         return cls._client
 
     @classmethod
-    def get_messages(cls, db: Session, workspace_id: str) -> list[ChatMessage]:
-        return db.query(ChatMessage).filter(ChatMessage.workspace_id == workspace_id).order_by(ChatMessage.created_at.asc()).all()
+    def get_messages(cls, db: Session, workspace_id: str, after: str | None = None) -> list[ChatMessage]:
+        query = db.query(ChatMessage).filter(ChatMessage.workspace_id == workspace_id)
+        if after:
+            query = query.filter(ChatMessage.created_at > datetime.fromisoformat(after))
+        return query.order_by(ChatMessage.created_at.asc()).all()
 
     @classmethod
-    def send_message(cls, db: Session, user_content: str, workspace_id: str, source_ids: list[int] | None = None) -> ChatMessage:
+    def send_message(cls, db: Session, user_content: str, workspace_id: str, source_ids: list[int] | None = None, after: str | None = None) -> ChatMessage:
         # Save user message
         user_msg = ChatMessage(role="user", content=user_content, workspace_id=workspace_id)
         db.add(user_msg)
@@ -53,9 +57,12 @@ class ChatService:
             )
 
         # Build conversation history (last 20 messages to stay within token limits)
-        history = db.query(ChatMessage).filter(
+        history_query = db.query(ChatMessage).filter(
             ChatMessage.workspace_id == workspace_id
-        ).order_by(ChatMessage.created_at.asc()).all()
+        )
+        if after:
+            history_query = history_query.filter(ChatMessage.created_at > datetime.fromisoformat(after))
+        history = history_query.order_by(ChatMessage.created_at.asc()).all()
         # Exclude the user message we just saved (it's the last one)
         history = history[:-1]
         # Keep last 20 messages to avoid token overflow

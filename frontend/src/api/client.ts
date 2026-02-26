@@ -71,11 +71,14 @@ export function createApi(workspaceId: string) {
       request<void>(`${p}/sources/${id}`, { method: "DELETE" }),
 
     // Chat
-    getMessages: () => request<import("../types").ChatMessage[]>(`${p}/chat`),
-    sendMessage: (content: string, source_ids?: number[]) =>
+    getMessages: (after?: string) => {
+      const params = after ? `?after=${encodeURIComponent(after)}` : "";
+      return request<import("../types").ChatMessage[]>(`${p}/chat${params}`);
+    },
+    sendMessage: (content: string, source_ids?: number[], after?: string) =>
       request<import("../types").ChatMessage>(`${p}/chat`, {
         method: "POST",
-        body: JSON.stringify({ content, source_ids }),
+        body: JSON.stringify({ content, source_ids, after }),
       }),
     getSuggestions: () =>
       request<{ suggestions: string[] }>(`${p}/chat/suggestions`).then((r) => r.suggestions),

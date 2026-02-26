@@ -10,11 +10,12 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [chatResetAt, setChatResetAt] = useState<string | undefined>(undefined);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.getMessages().then(setMessages).catch(() => {});
-  }, [refreshKey]);
+    api.getMessages(chatResetAt).then(setMessages).catch(() => {});
+  }, [refreshKey, chatResetAt]);
 
   // Fetch suggestions when chat is empty and sources exist
   useEffect(() => {
@@ -33,11 +34,66 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const SLASH_COMMANDS: Record<string, string> = {
+    "/new": "Clear the chat and start a fresh conversation",
+    "/help": "Show available commands",
+  };
+
+  const handleSlashCommand = (command: string): boolean => {
+    const cmd = command.toLowerCase().trim();
+
+    if (cmd === "/new") {
+      setChatResetAt(new Date().toISOString());
+      setMessages([]);
+      return true;
+    }
+
+    if (cmd === "/help") {
+      const helpText = Object.entries(SLASH_COMMANDS)
+        .map(([cmd, desc]) => `**${cmd}** — ${desc}`)
+        .join("\n");
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          role: "assistant",
+          content: `Available commands:\n\n${helpText}`,
+          sources_cited: null,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      return true;
+    }
+
+    if (cmd.startsWith("/")) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          role: "assistant",
+          content: `Unknown command \`${cmd}\`. Type **/help** for available commands.`,
+          sources_cited: null,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      return true;
+    }
+
+    return false;
+  };
+
   const handleSend = async (e?: React.FormEvent, overrideContent?: string) => {
     if (e) e.preventDefault();
     const userContent = overrideContent?.trim() || input.trim();
     if (!userContent || loading) return;
     setInput("");
+
+    // Handle slash commands locally
+    if (userContent.startsWith("/")) {
+      handleSlashCommand(userContent);
+      return;
+    }
+
     setSuggestions([]);
 
     // Optimistic user message
@@ -53,9 +109,9 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
 
     try {
       const sourceIds = enabledSourceIds.size > 0 ? Array.from(enabledSourceIds) : undefined;
-      await api.sendMessage(userContent, sourceIds);
+      await api.sendMessage(userContent, sourceIds, chatResetAt);
       // Refresh all messages to get proper IDs
-      const updated = await api.getMessages();
+      const updated = await api.getMessages(chatResetAt);
       setMessages(updated);
     } catch {
       setMessages((prev) => [
