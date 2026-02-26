@@ -15,3 +15,6 @@ class ChatMessageResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class SuggestionsResponse(BaseModel):
+    suggestions: list[str]

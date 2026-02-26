@@ -1,27 +1,43 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Loader2, BookmarkPlus } from "lucide-react";
-import { api } from "../../api/client";
+import { Send, Loader2, BookmarkPlus, Sparkles } from "lucide-react";
+import type { Api } from "../../api/client";
 import type { ChatMessage } from "../../types";
 
-export function ChatPane({ enabledSourceIds, onSaveToNote }: { enabledSourceIds: Set<number>; onSaveToNote: (content: string) => void }) {
+export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { api: Api; refreshKey: number; enabledSourceIds: Set<number>; onSaveToNote: (content: string) => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.getMessages().then(setMessages).catch(() => {});
-  }, []);
+  }, [refreshKey]);
+
+  // Fetch suggestions when chat is empty and sources exist
+  useEffect(() => {
+    if (messages.length === 0 && enabledSourceIds.size > 0) {
+      setLoadingSuggestions(true);
+      api.getSuggestions()
+        .then(setSuggestions)
+        .catch(() => setSuggestions([]))
+        .finally(() => setLoadingSuggestions(false));
+    } else {
+      setSuggestions([]);
+    }
+  }, [messages.length, enabledSourceIds.size]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || loading) return;
-    const userContent = input.trim();
+  const handleSend = async (e?: React.FormEvent, overrideContent?: string) => {
+    if (e) e.preventDefault();
+    const userContent = overrideContent?.trim() || input.trim();
+    if (!userContent || loading) return;
     setInput("");
+    setSuggestions([]);
 
     // Optimistic user message
     const tempUser: ChatMessage = {
@@ -65,8 +81,31 @@ export function ChatPane({ enabledSourceIds, onSaveToNote }: { enabledSourceIds:
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full text-gray-500 text-sm">
-            Ask a question about your sources...
+          <div className="flex items-center justify-center h-full">
+            {loadingSuggestions ? (
+              <div className="flex flex-col items-center gap-3 text-gray-500">
+                <Sparkles size={20} className="animate-pulse" />
+                <span className="text-sm">Generating suggestions...</span>
+              </div>
+            ) : suggestions.length > 0 ? (
+              <div className="flex flex-col items-center gap-3 max-w-sm w-full px-4">
+                <div className="flex items-center gap-1.5 text-gray-400 text-sm mb-1">
+                  <Sparkles size={14} />
+                  <span>Try asking:</span>
+                </div>
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSend(undefined, s)}
+                    className="w-full text-left px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-xl text-sm text-gray-200 transition-colors cursor-pointer"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span className="text-gray-500 text-sm">Ask a question about your sources...</span>
+            )}
           </div>
         )}
         {messages.map((msg) => (
@@ -107,7 +146,7 @@ export function ChatPane({ enabledSourceIds, onSaveToNote }: { enabledSourceIds:
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-4 border-t border-gray-800">
+      <form onSubmit={(e) => handleSend(e)} className="p-4 border-t border-gray-800">
         <div className="flex gap-2">
           <input
             type="text"

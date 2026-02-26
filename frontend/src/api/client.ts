@@ -35,55 +35,85 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export const api = {
-  // Sources
-  getSources: () => request<import("../types").Source[]>("/api/sources"),
-  getSource: (id: number) =>
-    request<import("../types").Source>(`/api/sources/${id}`),
-  addUrl: (url: string) =>
-    request<import("../types").Source>("/api/sources/url", {
-      method: "POST",
-      body: JSON.stringify({ url }),
-    }),
-  getSharePointStatus: () =>
-    request<{ authenticated: boolean }>("/api/sources/sharepoint/status"),
-  loginSharePoint: () =>
-    request<{ ok: boolean }>("/api/sources/sharepoint/login", { method: "POST" }),
-  pasteContent: (title: string, content: string) =>
-    request<import("../types").Source>("/api/sources/paste", {
-      method: "POST",
-      body: JSON.stringify({ title, content }),
-    }),
-  uploadFile: async (file: File) => {
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/sources/upload", { method: "POST", body: form });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json() as Promise<import("../types").Source>;
-  },
-  deleteSource: (id: number) =>
-    request<void>(`/api/sources/${id}`, { method: "DELETE" }),
+function wsPrefix(workspaceId: string) {
+  return `/api/workspaces/${workspaceId}`;
+}
 
-  // Chat
-  getMessages: () => request<import("../types").ChatMessage[]>("/api/chat"),
-  sendMessage: (content: string, source_ids?: number[]) =>
-    request<import("../types").ChatMessage>("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({ content, source_ids }),
-    }),
+export function createApi(workspaceId: string) {
+  const p = wsPrefix(workspaceId);
+  return {
+    // Sources
+    getSources: () => request<import("../types").Source[]>(`${p}/sources`),
+    getSource: (id: number) =>
+      request<import("../types").Source>(`${p}/sources/${id}`),
+    addUrl: (url: string) =>
+      request<import("../types").Source>(`${p}/sources/url`, {
+        method: "POST",
+        body: JSON.stringify({ url }),
+      }),
+    getSharePointStatus: () =>
+      request<{ authenticated: boolean }>(`${p}/sources/sharepoint/status`),
+    loginSharePoint: () =>
+      request<{ ok: boolean }>(`${p}/sources/sharepoint/login`, { method: "POST" }),
+    pasteContent: (title: string, content: string) =>
+      request<import("../types").Source>(`${p}/sources/paste`, {
+        method: "POST",
+        body: JSON.stringify({ title, content }),
+      }),
+    uploadFile: async (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`${p}/sources/upload`, { method: "POST", body: form });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json() as Promise<import("../types").Source>;
+    },
+    deleteSource: (id: number) =>
+      request<void>(`${p}/sources/${id}`, { method: "DELETE" }),
 
-  // Artifacts
-  getArtifacts: () => request<import("../types").Artifact[]>("/api/artifacts"),
-  createArtifact: (title: string, content_markdown: string) =>
-    request<import("../types").Artifact>("/api/artifacts", {
+    // Chat
+    getMessages: () => request<import("../types").ChatMessage[]>(`${p}/chat`),
+    sendMessage: (content: string, source_ids?: number[]) =>
+      request<import("../types").ChatMessage>(`${p}/chat`, {
+        method: "POST",
+        body: JSON.stringify({ content, source_ids }),
+      }),
+    getSuggestions: () =>
+      request<{ suggestions: string[] }>(`${p}/chat/suggestions`).then((r) => r.suggestions),
+
+    // Artifacts
+    getArtifacts: () => request<import("../types").Artifact[]>(`${p}/artifacts`),
+    createArtifact: (title: string, content_markdown: string) =>
+      request<import("../types").Artifact>(`${p}/artifacts`, {
+        method: "POST",
+        body: JSON.stringify({ title, content_markdown }),
+      }),
+    updateArtifact: (id: number, title: string, content_markdown: string) =>
+      request<import("../types").Artifact>(`${p}/artifacts/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ title, content_markdown }),
+      }),
+    deleteArtifact: (id: number) =>
+      request<void>(`${p}/artifacts/${id}`, { method: "DELETE" }),
+  };
+}
+
+// Workspaces
+export const workspaceApi = {
+  list: () => request<import("../types").Workspace[]>("/api/workspaces"),
+  create: (name?: string) =>
+    request<{ id: string; name: string }>("/api/workspaces", {
       method: "POST",
-      body: JSON.stringify({ title, content_markdown }),
+      body: JSON.stringify({ name: name ?? "Untitled Notebook" }),
     }),
-  updateArtifact: (id: number, title: string, content_markdown: string) =>
-    request<import("../types").Artifact>(`/api/artifacts/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({ title, content_markdown }),
+  get: (id: string) =>
+    request<import("../types").Workspace>(`/api/workspaces/${id}`),
+  rename: (id: string, name: string) =>
+    request<import("../types").Workspace>(`/api/workspaces/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
     }),
-  deleteArtifact: (id: number) =>
-    request<void>(`/api/artifacts/${id}`, { method: "DELETE" }),
+  delete: (id: string) =>
+    request<{ ok: boolean }>(`/api/workspaces/${id}`, { method: "DELETE" }),
 };
+
+export type Api = ReturnType<typeof createApi>;
