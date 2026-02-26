@@ -52,14 +52,25 @@ class ChatService:
                 "but still try to help with their question using your general knowledge."
             )
 
+        # Build conversation history (last 20 messages to stay within token limits)
+        history = db.query(ChatMessage).filter(
+            ChatMessage.workspace_id == workspace_id
+        ).order_by(ChatMessage.created_at.asc()).all()
+        # Exclude the user message we just saved (it's the last one)
+        history = history[:-1]
+        # Keep last 20 messages to avoid token overflow
+        history = history[-20:]
+
         # Call OpenAI
         client = cls._get_client()
+        messages = [{"role": "system", "content": system_prompt}]
+        for msg in history:
+            messages.append({"role": msg.role, "content": msg.content})
+        messages.append({"role": "user", "content": user_content})
+
         response = client.chat.completions.create(
             model=settings.chat_model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_content},
-            ],
+            messages=messages,
             temperature=0.3,
             max_tokens=2000,
         )
