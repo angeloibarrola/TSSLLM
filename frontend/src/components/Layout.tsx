@@ -53,9 +53,9 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
   const studioPanelRef = usePanelRef();
 
   // Track collapsed state for header button styling
-  const [sourcesCollapsed, setSourcesCollapsed] = useState(false);
-  const [chatCollapsed, setChatCollapsed] = useState(false);
-  const [studioCollapsed, setStudioCollapsed] = useState(false);
+  const [, setSourcesCollapsed] = useState(false);
+  const [, setChatCollapsed] = useState(false);
+  const [, setStudioCollapsed] = useState(false);
 
   const makeResizeHandler= (setCollapsed: (v: boolean) => void) => {
     return (size: PanelSize) => {
