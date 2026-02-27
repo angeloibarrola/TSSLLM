@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import numpy as np
 from openai import OpenAI
 from app.config import settings
@@ -50,14 +51,61 @@ class EmbeddingService:
     def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
         if not text:
             return []
-        chunks = []
-        start = 0
-        while start < len(text):
-            end = start + chunk_size
-            chunk = text[start:end]
-            if chunk.strip():
-                chunks.append(chunk.strip())
-            start += chunk_size - overlap
+
+        # Split into sentences (preserve the delimiter at the end of each sentence)
+        sentence_pattern = re.compile(r'(?<=[.!?])\s+|\n{2,}')
+        sentences = sentence_pattern.split(text.strip())
+        sentences = [s.strip() for s in sentences if s.strip()]
+
+        if not sentences:
+            return []
+
+        chunks: list[str] = []
+        current_sentences: list[str] = []
+        current_len = 0
+
+        for sentence in sentences:
+            sent_len = len(sentence)
+
+            # If a single sentence exceeds chunk_size, split it by characters
+            if sent_len > chunk_size:
+                # Flush current buffer first
+                if current_sentences:
+                    chunks.append(" ".join(current_sentences))
+                    current_sentences = []
+                    current_len = 0
+                # Character-level fallback for oversized sentences
+                start = 0
+                while start < sent_len:
+                    end = start + chunk_size
+                    piece = sentence[start:end].strip()
+                    if piece:
+                        chunks.append(piece)
+                    start += chunk_size - overlap
+                continue
+
+            # Would adding this sentence exceed the chunk size?
+            new_len = current_len + (1 if current_sentences else 0) + sent_len
+            if new_len > chunk_size and current_sentences:
+                chunks.append(" ".join(current_sentences))
+                # Overlap: carry trailing sentences whose total length <= overlap
+                overlap_sentences: list[str] = []
+                overlap_len = 0
+                for s in reversed(current_sentences):
+                    if overlap_len + len(s) + (1 if overlap_sentences else 0) > overlap:
+                        break
+                    overlap_sentences.insert(0, s)
+                    overlap_len += len(s) + (1 if len(overlap_sentences) > 1 else 0)
+                current_sentences = overlap_sentences
+                current_len = sum(len(s) for s in current_sentences) + max(0, len(current_sentences) - 1)
+
+            current_sentences.append(sentence)
+            current_len += (1 if len(current_sentences) > 1 else 0) + sent_len
+
+        # Flush remaining
+        if current_sentences:
+            chunks.append(" ".join(current_sentences))
+
         return chunks
 
     @classmethod
@@ -83,7 +131,7 @@ class EmbeddingService:
         cls._save_store()
 
     @classmethod
-    def query(cls, query_text: str, n_results: int = 15, source_ids: list[int] | None = None, workspace_id: str | None = None) -> list[dict]:
+    def query(cls, query_text: str, n_results: int = 15, source_ids: list[int] | None = None, workspace_id: str | None = None, min_similarity: float = 0.3) -> list[dict]:
         store = cls._load_store()
         if not store:
             return []
@@ -103,7 +151,10 @@ class EmbeddingService:
         for entry in candidates:
             entry_vec = np.array(entry["embedding"])
             sim = float(np.dot(query_vec, entry_vec) / (np.linalg.norm(query_vec) * np.linalg.norm(entry_vec) + 1e-10))
-            scored.append((sim, entry))
+            if sim >= min_similarity:
+                scored.append((sim, entry))
+        if not scored:
+            return []
         scored.sort(key=lambda x: x[0], reverse=True)
 
         # Ensure per-source coverage: pick top chunk from each source first
@@ -131,6 +182,7 @@ class EmbeddingService:
                 "id": entry["id"],
                 "text": entry["text"],
                 "metadata": entry["metadata"],
+                "similarity": sim,
                 "distance": 1.0 - sim,
             })
         return results

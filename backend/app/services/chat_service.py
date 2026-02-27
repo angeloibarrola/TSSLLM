@@ -87,7 +87,26 @@ class ChatService:
             n_results = max(15, num_sources * 3)
 
             # Retrieve relevant context from sources
-            contexts = EmbeddingService.query(user_content, n_results=n_results, source_ids=source_ids, workspace_id=workspace_id)
+            # HyDE: generate a hypothetical answer to use as the retrieval query
+            retrieval_query = user_content
+            if settings.hyde_enabled:
+                try:
+                    client = cls._get_client()
+                    hyde_response = client.chat.completions.create(
+                        model=settings.chat_model,
+                        messages=[
+                            {"role": "system", "content": "Given the question below, write a short paragraph that would answer it. Be specific and factual. Do not hedge or add disclaimers."},
+                            {"role": "user", "content": user_content},
+                        ],
+                        temperature=0.0,
+                        max_tokens=150,
+                    )
+                    hypothetical = hyde_response.choices[0].message.content.strip()
+                    retrieval_query = f"{user_content} {hypothetical}"
+                except Exception:
+                    pass  # fall back to raw query on any error
+
+            contexts = EmbeddingService.query(retrieval_query, n_results=n_results, source_ids=source_ids, workspace_id=workspace_id)
 
             # Build system prompt with context
             if contexts:
@@ -95,13 +114,14 @@ class ChatService:
                 context_text = "\n\n---\n\n".join(
                     f"[Source: {c['metadata']['source_name']}]\n{c['text']}" for c in contexts
                 )
-                source_list = "\n".join(f"- {name}" for name in source_names)
                 system_prompt = (
-                    "You are a helpful research assistant. Answer the user's question based on the provided source material. "
-                    "You MUST reference and address ALL of the following sources in your response — do not skip any:\n\n"
-                    f"{source_list}\n\n"
-                    "For each source, include relevant findings or insights. If a source does not contain information "
-                    "relevant to the question, briefly note that. Always cite sources by name.\n\n"
+                    "You are a knowledgeable research assistant. Answer the user's question using the source material below.\n\n"
+                    "Guidelines:\n"
+                    "- Cite sources by name when you use information from them (e.g., \"According to [Source Name], ...\")\n"
+                    "- Only cite sources that are relevant to the answer — do not mention irrelevant sources\n"
+                    "- If the source material does not contain enough information to answer the question, say so honestly "
+                    "and offer what you can from general knowledge\n"
+                    "- Be concise and direct. Use markdown formatting for readability.\n\n"
                     f"SOURCE MATERIAL:\n{context_text}"
                 )
             else:
