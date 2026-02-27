@@ -2,6 +2,7 @@ import { useState, useRef, useMemo } from "react";
 import { Panel, Group as PanelGroup, usePanelRef, type PanelSize } from "react-resizable-panels";
 import { Share2, Check, ArrowLeft } from "lucide-react";
 import { SourcesPane } from "./sources/SourcesPane";
+import { AddSourceModal } from "./sources/AddSourceModal";
 import { ChatPane } from "./chat/ChatPane";
 import { StudioPane } from "./studio/StudioPane";
 import { ResizeHandle } from "./ResizeHandle";
@@ -30,6 +31,10 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
   const [pendingArtifactId, setPendingArtifactId] = useState<number | null>(null);
   const allKnownIds = useRef<Set<number>>(new Set());
   const [copied, setCopied] = useState(false);
+
+  // Empty-state modal: show when notebook has no sources
+  const [sourcesEmpty, setSourcesEmpty] = useState(true);
+  const [modalDismissed, setModalDismissed] = useState(false);
 
   // Sync refresh counters — increment to trigger refetch in child panes
   const [sourcesRefresh, setSourcesRefresh] = useState(0);
@@ -79,6 +84,7 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
   };
 
   const onSourcesChanged = (sourceIds: number[]) => {
+    setSourcesEmpty(sourceIds.length === 0);
     const currentIds = new Set(sourceIds);
     setEnabledSourceIds((prev) => {
       if (prev.size === 0 && sourceIds.length > 0) {
@@ -190,6 +196,13 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
           <StudioPane api={api} refreshKey={artifactsRefresh} selectedSourceId={selectedSourceId} onClearSource={() => setSelectedSourceId(null)} pendingArtifactId={pendingArtifactId} onClearPending={() => setPendingArtifactId(null)} />
         </Panel>
       </PanelGroup>
+      {sourcesEmpty && !modalDismissed && (
+        <AddSourceModal
+          api={api}
+          onSourceAdded={() => setSourcesRefresh((n) => n + 1)}
+          onDismiss={() => setModalDismissed(true)}
+        />
+      )}
     </div>
   );
 }
