@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback, useMemo } from "react";
-import { Panel, Group as PanelGroup, usePanelRef, type PanelImperativeHandle, type PanelSize } from "react-resizable-panels";
-import { BookOpen, MessageSquare, FileText, Share2, Check, ArrowLeft } from "lucide-react";
+import { useState, useRef, useMemo } from "react";
+import { Panel, Group as PanelGroup, usePanelRef, type PanelSize } from "react-resizable-panels";
+import { Share2, Check, ArrowLeft } from "lucide-react";
 import { SourcesPane } from "./sources/SourcesPane";
 import { ChatPane } from "./chat/ChatPane";
 import { StudioPane } from "./studio/StudioPane";
@@ -52,17 +52,7 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
   const [chatCollapsed, setChatCollapsed] = useState(false);
   const [studioCollapsed, setStudioCollapsed] = useState(false);
 
-  const togglePanel = useCallback((ref: React.RefObject<PanelImperativeHandle | null>, collapsed: boolean) => {
-    const panel = ref.current;
-    if (!panel) return;
-    if (collapsed) {
-      panel.expand();
-    } else {
-      panel.collapse();
-    }
-  }, []);
-
-  const makeResizeHandler = (setCollapsed: (v: boolean) => void) => {
+  const makeResizeHandler= (setCollapsed: (v: boolean) => void) => {
     return (size: PanelSize) => {
       setCollapsed(size.asPercentage === 0);
     };
@@ -129,7 +119,7 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
             </button>
           )}
           <h1 className="text-lg font-bold tracking-tight">
-            📚 TSS LLM {teamName && <span className="text-gray-400 font-normal text-sm ml-1">{teamName}</span>}
+            AI Knowledge Notebook {teamName && <span className="text-gray-400 font-normal text-sm ml-1">{teamName}</span>}
           </h1>
           <NotebookSwitcher
             workspaces={workspaces}
@@ -143,32 +133,11 @@ export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNote
         <div className="flex items-center gap-1">
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white mr-2"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white"
             title="Copy workspace link"
           >
             {copied ? <Check size={14} /> : <Share2 size={14} />}
             {copied ? "Copied!" : "Share"}
-          </button>
-          <button
-            onClick={() => togglePanel(sourcesPanelRef, sourcesCollapsed)}
-            className={`p-1.5 rounded transition-colors ${sourcesCollapsed ? "text-gray-500 hover:text-gray-300" : "text-blue-400 hover:text-blue-300 bg-gray-800"}`}
-            title={sourcesCollapsed ? "Show Sources" : "Hide Sources"}
-          >
-            <BookOpen size={18} />
-          </button>
-          <button
-            onClick={() => togglePanel(chatPanelRef, chatCollapsed)}
-            className={`p-1.5 rounded transition-colors ${chatCollapsed ? "text-gray-500 hover:text-gray-300" : "text-blue-400 hover:text-blue-300 bg-gray-800"}`}
-            title={chatCollapsed ? "Show Chat" : "Hide Chat"}
-          >
-            <MessageSquare size={18} />
-          </button>
-          <button
-            onClick={() => togglePanel(studioPanelRef, studioCollapsed)}
-            className={`p-1.5 rounded transition-colors ${studioCollapsed ? "text-gray-500 hover:text-gray-300" : "text-blue-400 hover:text-blue-300 bg-gray-800"}`}
-            title={studioCollapsed ? "Show Studio" : "Hide Studio"}
-          >
-            <FileText size={18} />
           </button>
         </div>
       </header>
