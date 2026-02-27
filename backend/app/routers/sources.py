@@ -58,18 +58,11 @@ async def upload_file(workspace_id: str, file: UploadFile = File(...), db: Sessi
 @router.post("/url", response_model=SourceResponse)
 async def add_url(workspace_id: str, data: UrlCreate, db: Session = Depends(get_db)):
     if SharePointService.is_sharepoint_url(data.url):
-        token = SharePointService._get_token()
-        if not token:
-            raise HTTPException(status_code=401, detail="SharePoint not connected. Click 'Connect SharePoint' first.")
-        try:
-            source = await SourceService.create_from_sharepoint(db, data.url, token, workspace_id)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to fetch SharePoint content: {str(e)}")
-    else:
-        try:
-            source = await SourceService.create_from_url(db, data.url, workspace_id)
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {str(e)}")
+        raise HTTPException(status_code=400, detail="SharePoint URLs are not currently supported. Please copy the text on the page and paste it using the button above \"Paste Copied Text\"")
+    try:
+        source = await SourceService.create_from_url(db, data.url, workspace_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {str(e)}")
     EmbeddingService.add_source(source.id, source.name, source.content_text or "", workspace_id)
     await manager.broadcast(workspace_id, "sources_changed")
     return source

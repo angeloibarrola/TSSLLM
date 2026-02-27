@@ -58,7 +58,7 @@ Write-Host "Step 5: Configuring startup command..." -ForegroundColor Yellow
 az webapp config set `
     --name $appName `
     --resource-group $rgName `
-    --startup-file "gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 120"
+    --startup-file "gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 120"
 
 # Step 7: Enable WebSockets
 Write-Host "Step 6: Enabling WebSockets..." -ForegroundColor Yellow
