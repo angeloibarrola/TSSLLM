@@ -1,0 +1,301 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+<v Stuart>Licensing team, welcome to Q3 review. Diana, you're up. Let's get into it.
+
+00:00:05.300 --> 00:00:11.000
+<v Diana>Thanks Stuart. I'll say upfront — this was a tough quarter for Licensing. We had one critical bug that affected billing accuracy and it overshadowed everything else we shipped.
+
+00:00:11.300 --> 00:00:15.000
+<v Raza>Tell me about the billing bug first. I want to understand the blast radius.
+
+00:00:15.400 --> 00:00:28.000
+<v Diana>In our seat counting logic, when a user was deactivated in the middle of a billing cycle, we continued counting them as an active seat for the remainder of the month. The bug was introduced in the August release and wasn't caught until a customer did a manual audit of their invoice.
+
+00:00:28.300 --> 00:00:33.000
+<v Raza>How many customers were affected?
+
+00:00:33.400 --> 00:00:41.000
+<v Diana>We identified forty-one customers who were overcharged. Total overcharge amount was around nineteen thousand dollars across all affected accounts.
+
+00:00:41.300 --> 00:00:47.000
+<v Stuart>Nineteen thousand dollars. Have we issued credits?
+
+00:00:47.400 --> 00:00:53.000
+<v Diana>Yes. Finance processed the credits last week. Every affected customer received their full overcharge as a credit plus a twenty percent goodwill add.
+
+00:00:53.300 --> 00:00:58.000
+<v Stuart>Good call on the goodwill add. How were customers notified?
+
+00:00:58.400 --> 00:01:06.000
+<v Diana>Account managers reached out personally to enterprise customers — about twelve of the forty-one. The rest received a direct email from the billing team explaining what happened and how it was resolved.
+
+00:01:06.300 --> 00:01:12.000
+<v Raza>What was the detection failure? Why did it take a customer audit to find this?
+
+00:01:12.400 --> 00:01:23.000
+<v Diana>We don't have automated billing accuracy tests. Our test coverage for the billing engine is focused on happy path — seat added, seat removed, invoice generated. The edge case of mid-cycle deactivation wasn't in our test suite.
+
+00:01:23.300 --> 00:01:28.000
+<v Raza>That's a significant gap for a billing system. Billing accuracy needs to be treated like a critical system.
+
+00:01:28.400 --> 00:01:37.000
+<v Diana>Agreed. We're building a billing reconciliation test suite as a direct result. It'll run daily and compare expected seat counts against invoice line items. Any discrepancy above a threshold triggers an alert.
+
+00:01:37.300 --> 00:01:42.000
+<v Raza>That reconciliation test should be automated and continuous. When does it go live?
+
+00:01:42.400 --> 00:01:47.000
+<v Diana>End of this sprint. It's already in progress.
+
+00:01:47.300 --> 00:01:52.000
+<v Raza>Good. This should have existed from day one. Let's make sure the test suite covers every seat state transition — not just the ones we've thought of yet.
+
+00:01:52.400 --> 00:01:58.000
+<v Diana>We're documenting all state transitions in a state machine diagram and each transition will have a test. I'll share the doc with you when it's done.
+
+00:01:58.300 --> 00:02:04.000
+<v Stuart>Okay. What did we actually ship beyond dealing with this mess?
+
+00:02:04.400 --> 00:02:16.000
+<v Diana>We shipped usage-based license model support — the ability to price based on API calls or scan volume rather than seats. We shipped multi-organization license hierarchies for enterprise customers with subsidiaries. And we shipped the license utilization dashboard.
+
+00:02:16.300 --> 00:02:22.000
+<v Stuart>The usage-based model is huge. Who's using it and is it working?
+
+00:02:22.400 --> 00:02:32.000
+<v Diana>Three customers have migrated to usage-based pricing. Two are net positive for us — they're using more than they expected. One is net negative — they overestimated their usage and ended up paying less than under seats.
+
+00:02:32.300 --> 00:02:38.000
+<v Stuart>The one that's paying less — is that a problem or expected?
+
+00:02:38.400 --> 00:02:47.000
+<v Diana>Expected. Usage-based pricing is intentionally flexible. The customer is happy with the model. Long term, as they grow, usage will increase and so will their spend. The flexibility is the selling point.
+
+00:02:47.300 --> 00:02:54.000
+<v Stuart>What's the sales team saying about usage-based pricing? Is it helping close deals?
+
+00:02:54.400 --> 00:03:04.000
+<v Diana>Sales loves it for getting smaller companies in the door. The objection to seat pricing from startups is often "we don't know how many seats we'll need." Usage-based removes that objection.
+
+00:03:04.300 --> 00:03:10.000
+<v Raza>What's the billing complexity? Usage-based metering is harder to implement accurately than seats.
+
+00:03:10.400 --> 00:03:21.000
+<v Diana>It is. We built a metering pipeline that captures usage events from each product team and aggregates them into billing periods. The pipeline is running but I have some reliability concerns — we occasionally drop events during high load.
+
+00:03:21.300 --> 00:03:27.000
+<v Raza>How often and what's the customer impact?
+
+00:03:27.400 --> 00:03:37.000
+<v Diana>We've identified three instances in the last month where we undercounted usage by less than one percent. Technically we're under-billing customers. That's the customer-friendly failure mode — we're not over-billing them. But it's revenue we're leaving on the table.
+
+00:03:37.300 --> 00:03:43.000
+<v Raza>One percent undercounting adds up. What's the metering pipeline architecture?
+
+00:03:43.400 --> 00:03:53.000
+<v Diana>Events come in via an internal event bus, get batched and written to a metering store, then aggregated for billing. The drops happen at the event bus to metering store step when the batch writer is under pressure.
+
+00:03:53.300 --> 00:03:59.000
+<v Raza>That sounds like a buffer or retry issue. Is the event bus at-least-once delivery?
+
+00:03:59.400 --> 00:04:07.000
+<v Diana>It should be but the implementation has a bug. When a batch write fails and retries, duplicate prevention logic is too aggressive and ends up dropping some legitimate events.
+
+00:04:07.300 --> 00:04:13.000
+<v Raza>So we're deduplicating too aggressively and throwing away real events. Is this on the radar to fix?
+
+00:04:13.400 --> 00:04:19.000
+<v Diana>It's in the backlog. The Infra team owns the event bus and we've filed a ticket. It's been sitting for three weeks.
+
+00:04:19.300 --> 00:04:25.000
+<v Raza>I'll escalate with the Infra team lead. Metering accuracy is a revenue integrity issue. It should not be sitting in a backlog.
+
+00:04:25.400 --> 00:04:29.000
+<v Diana>I would appreciate that escalation. We've been trying to get traction on it ourselves.
+
+00:04:29.300 --> 00:04:36.000
+<v Stuart>The license utilization dashboard — tell me more. What does it show and are customers using it?
+
+00:04:36.400 --> 00:04:48.000
+<v Diana>It shows seat utilization over time, which users are active versus inactive, and projected overage if current growth continues. Eighty-two percent of admins who log in visit the dashboard. It's one of our most visited features.
+
+00:04:48.300 --> 00:04:53.000
+<v Stuart>That's fantastic adoption. What are customers doing with the data?
+
+00:04:53.400 --> 00:05:03.000
+<v Diana>Two behaviors. Some are proactively cleaning up inactive seats to optimize spend. Others are using the projection data to time their license renewals and upgrades.
+
+00:05:03.300 --> 00:05:09.000
+<v Stuart>Customers optimizing spend could mean they buy fewer seats. Is that a concern?
+
+00:05:09.400 --> 00:05:19.000
+<v Diana>It's a valid concern. But the alternative is customers feeling they're overpaying, not renewing, or churning. Transparency builds trust. A customer who feels they're paying fairly renews. One who feels overcharged doesn't.
+
+00:05:19.300 --> 00:05:25.000
+<v Stuart>I agree with the philosophy. The expansion upside is customers knowing exactly when they need more seats and upgrading on time instead of scrambling.
+
+00:05:25.400 --> 00:05:31.000
+<v Diana>We've already seen two customers proactively upgrade because the dashboard showed they were approaching their limit. That's a better customer experience than a hard block.
+
+00:05:31.300 --> 00:05:38.000
+<v Raza>What's the multi-org hierarchy feature? I want to understand the use case.
+
+00:05:38.400 --> 00:05:50.000
+<v Diana>Enterprise customers like conglomerates or consulting firms have multiple business units that want their own isolated environments but want centralized billing and license management. Parent organization holds the licenses, allocates them to subsidiaries.
+
+00:05:50.300 --> 00:05:56.000
+<v Raza>What's the administrative surface look like? Can the parent see what subsidiaries are doing?
+
+00:05:56.400 --> 00:06:07.000
+<v Diana>Parent can see aggregate usage per subsidiary — how many seats allocated, how many used. They cannot see individual user activity within a subsidiary. There's a permissions boundary there for privacy.
+
+00:06:07.300 --> 00:06:12.000
+<v Raza>Good that you've drawn that line. How many enterprise customers have adopted this?
+
+00:06:12.400 --> 00:06:18.000
+<v Diana>Two so far. Both migrated from flat organization structures. The migration took significant support effort — three to five days each.
+
+00:06:18.300 --> 00:06:24.000
+<v Stuart>Three to five days of support effort per migration is not scalable. What's making it hard?
+
+00:06:24.400 --> 00:06:35.000
+<v Diana>The migration tooling is manual. We don't have a self-service migration wizard. Customers have to reconfigure users, assign them to subsidiaries, and we do the billing restructuring on our end. It's error-prone.
+
+00:06:35.300 --> 00:06:41.000
+<v Stuart>A self-service migration wizard should be in Q4 before we try to sell this to more enterprise customers.
+
+00:06:41.400 --> 00:06:47.000
+<v Diana>Agreed. I've already drafted the spec. It's a four sprint effort.
+
+00:06:47.300 --> 00:06:53.000
+<v Stuart>Good. What's on the Q4 roadmap otherwise?
+
+00:06:53.400 --> 00:07:06.000
+<v Diana>Five priorities. One — billing reconciliation system to GA. Two — org hierarchy migration wizard. Three — contract management features — storing contract terms, renewal dates, auto-reminders. Four — license transfer between users — currently you have to go through support. Five — improved metering reliability once the event bus bug is fixed.
+
+00:07:06.300 --> 00:07:12.000
+<v Stuart>License transfer between users — that's a big pain point in support isn't it?
+
+00:07:12.400 --> 00:07:20.000
+<v Diana>Our number three most common support ticket. Someone leaves the company, their license needs to go to their replacement. Takes four to six support hours per request today.
+
+00:07:20.300 --> 00:07:26.000
+<v Stuart>Self-service license transfer should have shipped a long time ago. Why hasn't it?
+
+00:07:26.400 --> 00:07:35.000
+<v Diana>It touches authentication, billing, and our audit log system. Every time we spec it out it has more dependencies than expected. We kept deprioritizing it.
+
+00:07:35.300 --> 00:07:41.000
+<v Raza>How many support hours are we spending on this per month?
+
+00:07:41.400 --> 00:07:47.000
+<v Diana>We estimated about sixty support hours per month on license transfer requests.
+
+00:07:47.300 --> 00:07:52.000
+<v Raza>That's a real cost. If we can eliminate sixty hours of support per month, the ROI of building this is immediate.
+
+00:07:52.400 --> 00:07:58.000
+<v Stuart>Agreed. This needs to move to the top of Q4. Not below contract management.
+
+00:07:58.400 --> 00:08:04.000
+<v Diana>I hear you. I'll reorder the roadmap. License transfer first, then contract management.
+
+00:08:04.300 --> 00:08:11.000
+<v Raza>Tell me about contract management. What's the customer need?
+
+00:08:11.400 --> 00:08:23.000
+<v Diana>Enterprise customers manage their contracts offline — in email, PDF, maybe their own contract management system. They want their contract terms visible in the product — renewal date, what's included in their tier, when they're approaching limits that trigger a tier upgrade.
+
+00:08:23.300 --> 00:08:30.000
+<v Stuart>This is a retention play. If customers see their renewal date and usage projections in the same view, we surface the renewal conversation at the right time.
+
+00:08:30.400 --> 00:08:37.000
+<v Diana>Exactly. Right now renewals are handled entirely by the account manager reaching out. The customer has no self-service visibility.
+
+00:08:37.300 --> 00:08:43.000
+<v Stuart>How do we ingest the contract data? Do we have a source of truth for contract terms?
+
+00:08:43.400 --> 00:08:52.000
+<v Diana>Currently it's in Salesforce. We'd need to build a sync from Salesforce to our product database. That's actually the biggest part of the effort — the product UI is relatively straightforward.
+
+00:08:52.300 --> 00:08:58.000
+<v Raza>Is the Salesforce sync reliable? I've heard horror stories about Salesforce data quality.
+
+00:08:58.400 --> 00:09:07.000
+<v Diana>Our Salesforce data quality is decent for account terms. The gaps are in historical amendments — if a contract was modified, sometimes the Salesforce record doesn't reflect the latest version.
+
+00:09:07.300 --> 00:09:13.000
+<v Raza>We'd need a manual override in the product for cases where Salesforce data is wrong.
+
+00:09:13.400 --> 00:09:19.000
+<v Diana>Yes. Admin-facing override with an audit trail. We've thought about that.
+
+00:09:19.300 --> 00:09:26.000
+<v Stuart>Good. Make sure the spec includes the error handling and manual override story before you start building.
+
+00:09:26.400 --> 00:09:32.000
+<v Diana>Already in the spec draft.
+
+00:09:32.300 --> 00:09:40.000
+<v Raza>I want to ask about the license compliance reporting. We had a customer ask last quarter about being able to demonstrate to their auditors that everyone using the product has a valid license. Where are we on that?
+
+00:09:40.400 --> 00:09:50.000
+<v Diana>We can export a user list with license assignment dates from the admin panel. What we don't have is a formal compliance report that ties user access to license terms in a signed, auditable document.
+
+00:09:50.300 --> 00:09:56.000
+<v Raza>A signed document — you mean a PDF we generate with our signature that says "as of this date, these N users are licensed under contract X"?
+
+00:09:56.400 --> 00:10:05.000
+<v Diana>Exactly. For regulated industries, informal data exports aren't sufficient. They need a document they can point to in an audit.
+
+00:10:05.300 --> 00:10:11.000
+<v Stuart>How many customers need this?
+
+00:10:11.400 --> 00:10:18.000
+<v Diana>We've had four explicit requests this quarter. But I think it's a much larger latent need — especially as we move upmarket.
+
+00:10:18.300 --> 00:10:24.000
+<v Stuart>Let's add it to Q4 as a compliance report feature. Similar to what Release team is building for deployment audits.
+
+00:10:24.400 --> 00:10:30.000
+<v Diana>I actually talked to Omar about this. There's overlap — both teams need a signed, exportable compliance document. We should build it once and share it.
+
+00:10:30.300 --> 00:10:36.000
+<v Raza>That's exactly the kind of cross-team alignment I want to see. Can the two of you work together on a shared compliance report infrastructure?
+
+00:10:36.400 --> 00:10:42.000
+<v Diana>Yes. Omar and I have already talked. We're thinking a platform-level signed document service that each team can plug their data into.
+
+00:10:42.300 --> 00:10:48.000
+<v Raza>Put a joint design doc together and loop me in before you start building. I want to make sure Infra is involved so this doesn't create another siloed service.
+
+00:10:48.400 --> 00:10:53.000
+<v Diana>Will do. I'll set up a kickoff with Omar and the Infra team lead.
+
+00:10:53.300 --> 00:11:00.000
+<v Stuart>Last question — how's the team morale after the billing bug quarter? That's a stressful thing to deal with.
+
+00:11:00.400 --> 00:11:11.000
+<v Diana>It was hard. Nobody wants to ship a billing bug. The team has been heads down on the reconciliation work and I think turning a bad situation into an improvement has been somewhat healing. But I won't pretend it didn't shake people's confidence.
+
+00:11:11.300 --> 00:11:18.000
+<v Stuart>That's honest and I appreciate it. Is there anything I can do to support the team?
+
+00:11:18.400 --> 00:11:26.000
+<v Diana>Honestly, public recognition would help. The team shipped three significant features this quarter on top of the incident response. I'd love a shoutout in the all-hands for the usage-based billing work specifically — that took a lot of careful engineering.
+
+00:11:26.300 --> 00:11:31.000
+<v Stuart>Done. I'll call it out next all-hands. You have my word.
+
+00:11:31.400 --> 00:11:38.000
+<v Raza>Alright. Summary: billing reconciliation ship end of sprint. License transfer moved to Q4 priority one. Org hierarchy migration wizard priority two. Contract management and compliance export in Q4. Cross-team compliance document service with Omar and Infra. Metering reliability — I'll escalate with Infra today. Anything missing?
+
+00:11:38.300 --> 00:11:43.000
+<v Diana>That covers it. Thanks for the escalation on the event bus ticket — we've been hitting a wall there.
+
+00:11:43.400 --> 00:11:48.000
+<v Raza>Consider it done. Good session everyone.
+
+00:11:48.300 --> 00:11:53.000
+<v Stuart>Thanks Diana. Tough quarter handled well. See everyone next time.

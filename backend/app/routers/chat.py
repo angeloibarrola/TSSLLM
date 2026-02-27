@@ -18,6 +18,11 @@ def get_suggestions(workspace_id: str, db: Session = Depends(get_db)):
     suggestions = ChatService.generate_suggestions(db, workspace_id)
     return SuggestionsResponse(suggestions=suggestions)
 
+@router.post("/followups", response_model=SuggestionsResponse)
+def get_followups(workspace_id: str, db: Session = Depends(get_db)):
+    followups = ChatService.generate_followups(db, workspace_id)
+    return SuggestionsResponse(suggestions=followups)
+
 @router.post("/reset")
 def reset_chat(workspace_id: str, db: Session = Depends(get_db)):
     ws = db.query(Workspace).filter(Workspace.id == workspace_id).first()

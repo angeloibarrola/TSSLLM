@@ -10,6 +10,8 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [followups, setFollowups] = useState<string[]>([]);
+  const [loadingFollowups, setLoadingFollowups] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, followups]);
 
   const SLASH_COMMANDS: Record<string, string> = {
     "/new": "Clear the chat and start a fresh conversation",
@@ -101,6 +103,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
     }
 
     setSuggestions([]);
+    setFollowups([]);
 
     // Optimistic user message
     const tempUser: ChatMessage = {
@@ -119,6 +122,12 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
       // Refresh all messages to get proper IDs
       const updated = await api.getMessages();
       setMessages(updated);
+      // Fetch follow-up suggestions in the background
+      setLoadingFollowups(true);
+      api.getFollowups()
+        .then(setFollowups)
+        .catch(() => setFollowups([]))
+        .finally(() => setLoadingFollowups(false));
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -209,6 +218,34 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
             <div className="bg-gray-800 px-4 py-2.5 rounded-2xl rounded-bl-md">
               <Loader2 size={16} className="animate-spin text-gray-400" />
             </div>
+          </div>
+        )}
+        {!loading && (loadingFollowups || followups.length > 0) && (
+          <div className="flex flex-col items-start gap-2 mt-2">
+            {loadingFollowups ? (
+              <div className="flex items-center gap-1.5 text-gray-500 text-xs px-1">
+                <Sparkles size={12} className="animate-pulse" />
+                <span>Thinking of follow-ups...</span>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-1.5 text-gray-500 text-xs px-1">
+                  <Sparkles size={12} />
+                  <span>Follow up:</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {followups.map((f, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(undefined, f)}
+                      className="px-3 py-2 bg-gray-800/60 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-xl text-xs text-gray-300 transition-colors cursor-pointer text-left max-w-xs"
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
         <div ref={bottomRef} />

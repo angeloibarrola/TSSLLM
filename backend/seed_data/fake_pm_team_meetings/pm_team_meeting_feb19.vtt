@@ -1,0 +1,348 @@
+WEBVTT
+
+NOTE
+PM Team Meeting — Week 3
+Date: Wednesday, February 19, 2025
+Attendees: Mac (PM Manager), Priya (Sign Lead), Jordan (Sign), Fatima (Sign), Lena (Scan Lead), Theo (Scan), Amara (Scan), Omar (Release Lead), Chloe (Release), Raj (Release), Diana (Licensing Lead), Yuki (Licensing), Ben (Licensing)
+
+00:00:00.000 --> 00:00:07.000
+<v Mac>Good morning. I want to start differently this week. I had a one-on-one with Stuart yesterday and there's news I need to share. Some of it's good, some of it requires us to adapt. I'll give you the full picture.
+
+00:00:07.300 --> 00:00:11.000
+<v Omar>That sounds like an interesting one-on-one.
+
+00:00:11.400 --> 00:00:22.000
+<v Mac>It was. So — finance completed its review. The outcome for our team is: no headcount reductions. Existing positions are safe. I want to say that clearly and unambiguously before I share the other part.
+
+00:00:22.300 --> 00:00:25.000
+<v Yuki>That's a relief. I'll be honest — I've been stressed about it.
+
+00:00:25.400 --> 00:00:30.000
+<v Chloe>Same. Thank you for telling us immediately.
+
+00:00:30.300 --> 00:00:38.000
+<v Mac>Of course. Now the other part: the new hire req for Sign — the developer experience PM — has been paused until Q3. Finance approved continuing our current team size but new growth hires are deferred to Q3 at the earliest pending Q1 and Q2 revenue performance.
+
+00:00:38.300 --> 00:00:43.000
+<v Priya>I expected that honestly. Disappointing but not surprising. We'll manage.
+
+00:00:43.400 --> 00:00:49.000
+<v Mac>I know it puts more pressure on the Sign team. Priya, let's talk after this meeting about how we reprioritize given the constraint. Jordan, Fatima — I know you've both been absorbing some of the developer experience work informally. We may need to make that more explicit.
+
+00:00:49.300 --> 00:00:54.000
+<v Fatima>I'm okay with that. I'd rather know it's officially my scope than feel like I'm stepping in where I shouldn't be.
+
+00:00:54.400 --> 00:01:00.000
+<v Mac>That's a fair point and I appreciate you naming it. Scope clarity is something I owe you. We'll sort it.
+
+00:01:00.300 --> 00:01:07.000
+<v Jordan>What about the other open reqs? I know Scan had an ask in too.
+
+00:01:07.400 --> 00:01:15.000
+<v Mac>All open reqs are paused until Q3. It's across the board, not just Sign. Lena, same situation for anything you had pending.
+
+00:01:15.400 --> 00:01:20.000
+<v Lena>I had a half-req — I was hoping to backfill a PM who transitioned to a different team in January. That's paused too?
+
+00:01:20.300 --> 00:01:26.000
+<v Mac>Yes. Backfills fall under the same freeze. I know that's frustrating. The team is lean.
+
+00:01:26.400 --> 00:01:33.000
+<v Lena>We'll make it work. But I want to flag that the Scan team is at a point where adding more scope — like the IaC scanning initiative — without adding PM capacity is a risk.
+
+00:01:33.300 --> 00:01:42.000
+<v Mac>I hear you and I think that's a legitimate concern to document. When we go back to Stuart with the Q3 headcount case, that kind of scope-to-PM-ratio argument is exactly what we need. Can you quantify it? Hours per initiative, coverage gaps — make it concrete.
+
+00:01:42.400 --> 00:01:47.000
+<v Lena>I can do that. It'll take a few days but I can pull it together.
+
+00:01:47.300 --> 00:01:52.000
+<v Mac>Do it. Good documentation now becomes a strong Q3 case later. Okay — let me move to the strategic narratives. These are due from the leads today. I want to spend a good chunk of this meeting previewing them so we can give feedback before the exec presentation.
+
+00:01:52.300 --> 00:01:56.000
+<v Mac>Priya, you want to go first?
+
+00:01:56.400 --> 00:02:08.000
+<v Priya>Sure. The Sign six-month narrative has three themes. First: make code signing invisible — the goal is that developers don't have to think about it. It just happens in their pipeline. Second: build the enterprise trust layer — HSM integration, key rotation, audit trails. Third: expand the artifact footprint — container images, SBOMs, Helm charts. The through line is: Sign becomes the thing you don't think about until something goes wrong, and then you're very glad it's there.
+
+00:02:08.300 --> 00:02:14.000
+<v Mac>I love "invisible." That's a strong product philosophy. What's missing for me is the six-month success metric. What does success look like?
+
+00:02:14.400 --> 00:02:21.000
+<v Priya>I have three: eighty percent of releases signed end to end, zero manual key management steps for enterprise customers, and CSAT above four point five.
+
+00:02:21.300 --> 00:02:26.000
+<v Mac>Those are good. Put them front and center. Stuart loves numbers. Any feedback from the team on Sign's narrative?
+
+00:02:26.300 --> 00:02:31.000
+<v Theo>I'd add something about how Sign enables Scan. A signed artifact tells you it hasn't been tampered with since signing — that's actually a Scan input. That connection isn't explicit in what you described.
+
+00:02:31.400 --> 00:02:37.000
+<v Priya>That's a great point. I'll add a slide on Sign as the integrity foundation that Scan builds on.
+
+00:02:37.300 --> 00:02:42.000
+<v Mac>Good cross-team thinking Theo. That's exactly the platform connective tissue we need. Lena?
+
+00:02:42.400 --> 00:02:55.000
+<v Lena>Scan's narrative has two bets. First bet: speed. Sub-twenty-second scanning at p95 by end of Q2. That's competitive parity with Snyk on large images and it's the thing losing us evaluations. Second bet: intelligence. False positive rate under three percent through reachability analysis — starting with Go, expanding to Java in Q1 of 2026. The narrative is: Scan moves from "a scanner" to "an intelligent vulnerability advisor."
+
+00:02:55.300 --> 00:03:01.000
+<v Mac>I like that reframe — from scanner to advisor. What does the advisor framing unlock in terms of product direction?
+
+00:03:01.400 --> 00:03:11.000
+<v Lena>It unlocks prioritization guidance. Not just "you have fourteen critical CVEs" — but "here are the two you need to fix this week because they're reachable and your service is exposed to the internet." That's the version a security-aware developer actually acts on.
+
+00:03:11.300 --> 00:03:16.000
+<v Mac>That's a compelling product vision. Is that in the six-month roadmap or further out?
+
+00:03:16.400 --> 00:03:22.000
+<v Lena>The prioritization guidance is twelve months out. In six months we're laying the foundation — reachability analysis in Go. But the narrative is the direction.
+
+00:03:22.300 --> 00:03:28.000
+<v Mac>Good. Distinguish clearly in the deck between six-month deliverables and twelve-month direction. Don't let the exec team think you're promising the advisor vision in six months.
+
+00:03:28.400 --> 00:03:32.000
+<v Lena>Noted. I'll add a "now vs. next" timeline.
+
+00:03:32.300 --> 00:03:37.000
+<v Jordan>Quick question on the speed narrative — how confident are we in the twenty-second p95 target? The DB refactor is complex.
+
+00:03:37.400 --> 00:03:46.000
+<v Lena>Sixty-five percent confident. I debated whether to include it. But if I don't commit to a number the exec team will push back and ask what we're actually promising. I'd rather have a stretch goal that drives the team.
+
+00:03:46.300 --> 00:03:53.000
+<v Mac>I'd frame it as a target with stated dependencies rather than an unconditional commitment. Something like: "achieving twenty seconds at p95 depends on the DB refactor completing by end of Q1." That's honest and still directional.
+
+00:03:53.400 --> 00:03:57.000
+<v Lena>Good framing. I'll adjust the slide.
+
+00:03:57.300 --> 00:04:02.000
+<v Mac>Omar? Release narrative?
+
+00:04:02.400 --> 00:04:15.000
+<v Omar>Release's six-month story is about becoming the platform for enterprise deployment governance. Three pillars: safe deployments — phased rollouts, safe rollback, environment dependencies. Compliant deployments — ServiceNow integration, SOC2 audit export, deployment evidence trails. And resilient deployments — multi-region orchestration. The thesis is: enterprises don't just want fast deployments. They want deployments they can defend to auditors and stakeholders.
+
+00:04:15.300 --> 00:04:21.000
+<v Mac>That "deployments you can defend" framing is strong. Is that language in the deck explicitly?
+
+00:04:21.400 --> 00:04:25.000
+<v Omar>Not yet. It emerged as I was talking through it just now.
+
+00:04:25.300 --> 00:04:31.000
+<v Mac>Put it in. That's a memorable phrase. What's your six-month success metric?
+
+00:04:31.400 --> 00:04:40.000
+<v Omar>Enterprise tier adoption of approval gates up to sixty percent — currently forty percent. Multi-region in beta with five enterprise customers. ServiceNow integration shipped. Zero P1 incidents related to deployment failures.
+
+00:04:40.300 --> 00:04:46.000
+<v Mac>Good set of metrics. The zero P1 incidents one is interesting — that's an availability commitment. Are you confident in that given the incidents we had in Q3?
+
+00:04:46.400 --> 00:04:55.000
+<v Omar>Confident enough to put it in. We've invested significantly in reliability since Q3. The load test environment, the circuit breakers, the safe rollback feature. I think we've addressed the systemic causes.
+
+00:04:55.300 --> 00:05:01.000
+<v Mac>Fair. I'd add a caveat around known unknowns — multi-region is new territory and it may surface new failure modes. Acknowledge that in the deck.
+
+00:05:01.400 --> 00:05:06.000
+<v Omar>Good call. I'll add a risks slide.
+
+00:05:06.300 --> 00:05:11.000
+<v Mac>Diana? Licensing?
+
+00:05:11.400 --> 00:05:24.000
+<v Diana>Licensing's narrative is about trust at scale. The idea is: as companies expand their use of the platform — more products, more teams, more users — Licensing is what keeps it governable. Three themes. Self-service administration — license transfers, org hierarchy management, no more support tickets for routine admin. Compliance readiness — audit trails, signed compliance reports, contract visibility in the product. And usage intelligence — giving customers a clear picture of their spend and helping them make smarter buying decisions.
+
+00:05:24.300 --> 00:05:30.000
+<v Mac>I remember Yuki's framing from last week about Licensing as the enterprise trust layer. Is that in here?
+
+00:05:30.400 --> 00:05:36.000
+<v Diana>Yes — I positioned Licensing as "the enterprise control plane for the platform." The other three products generate activity and Licensing is where you govern who does what.
+
+00:05:36.300 --> 00:05:41.000
+<v Mac>That's the right angle. How are you connecting Licensing to the platform story?
+
+00:05:41.400 --> 00:05:51.000
+<v Diana>I have a slide that shows the customer journey: you start with Sign because security told you to sign your releases. You add Scan because a critical CVE scared you. You add Release because your deployments are getting complex. By the time you have all three, you need Licensing to manage who has access to what and how much you're spending.
+
+00:05:51.300 --> 00:05:56.000
+<v Mac>That's a beautiful platform narrative arc. Stuart is going to love that slide. Make sure it's clear and visual.
+
+00:05:56.400 --> 00:06:01.000
+<v Yuki>We're working with design to make it an actual journey diagram rather than bullet points.
+
+00:06:01.300 --> 00:06:06.000
+<v Mac>Perfect. That's worth the extra day it takes to design properly. Any feedback from the team on Licensing's narrative?
+
+00:06:06.400 --> 00:06:12.000
+<v Chloe>I actually think there's a Release-Licensing connection that isn't being captured. When a deployment happens, that's a consumption event that should inform the usage intelligence story.
+
+00:06:12.300 --> 00:06:18.000
+<v Diana>Interesting. Say more.
+
+00:06:18.400 --> 00:06:27.000
+<v Chloe>If Licensing could see deployment frequency as a usage signal — how often a team is using Release — that enriches the usage intelligence picture beyond just seat counts and API calls.
+
+00:06:27.300 --> 00:06:33.000
+<v Diana>That's actually a powerful expansion of what usage intelligence means. I hadn't thought about cross-product usage signals.
+
+00:06:33.400 --> 00:06:39.000
+<v Mac>Now we're cooking. This is what happens when four PM teams are in the same room. Chloe, Diana — can you explore that connection in your monthly sync?
+
+00:06:39.300 --> 00:06:42.000
+<v Diana>Absolutely. I'll add it to the agenda.
+
+00:06:42.400 --> 00:06:49.000
+<v Mac>Good. Okay — overall reaction to the four narratives. I want to say this publicly: these are genuinely strong. Last quarter's strategic narratives were mostly roadmap readouts with a few bullet points about vision. These have real thinking in them. I can see the team leveling up.
+
+00:06:49.300 --> 00:06:53.000
+<v Raj>That's encouraging to hear. The strategic narrative work felt harder than a roadmap.
+
+00:06:53.400 --> 00:07:01.000
+<v Mac>It is harder. It requires you to have a point of view about where the world is going, not just what your customers asked for last quarter. That's the muscle I want us building. The best PMs in the industry are doing this thinking constantly, not just when asked.
+
+00:07:01.300 --> 00:07:07.000
+<v Amara>Mac, is there a cadence you want us to revisit these? Like quarterly?
+
+00:07:07.400 --> 00:07:14.000
+<v Mac>I want a lighter refresh every quarter and a full re-examination every six months. The market moves, the competitive landscape shifts, customer needs evolve. A strategy that made sense in February might need adjusting in August. Build the habit of reviewing your narrative, not just your roadmap.
+
+00:07:14.300 --> 00:07:20.000
+<v Amara>That's a different rhythm than I've been in. Most teams I've worked on revisit strategy once a year if that.
+
+00:07:20.400 --> 00:07:28.000
+<v Mac>We move too fast for annual strategy cycles. Quarterly light reviews, biannual deep dives. I'll put it on the calendar so it doesn't get squeezed out.
+
+00:07:28.300 --> 00:07:35.000
+<v Mac>Okay. I want to spend a few minutes on something that came up in a few one-on-ones this week. Feedback culture. Specifically — how we give feedback to each other as PMs.
+
+00:07:35.400 --> 00:07:40.000
+<v Ben>This is timely. I've been wanting feedback on my spec writing but I don't know how to ask for it without it feeling awkward.
+
+00:07:40.300 --> 00:07:50.000
+<v Mac>That's exactly the kind of thing I want to normalize. The awkwardness you're describing comes from a culture where peer feedback is either reserved for review cycles or only happens when something goes wrong. I want to change that.
+
+00:07:50.400 --> 00:07:57.000
+<v Mac>Here's my proposal: every six weeks, I'm going to run a PM peer feedback session. Each person nominates one piece of work they want feedback on — a spec, a narrative, a customer research synthesis — and we spend ten minutes as a group giving structured feedback. Warm, specific, and actionable.
+
+00:07:57.300 --> 00:08:02.000
+<v Fatima>What does "structured" mean? Like a template?
+
+00:08:02.400 --> 00:08:10.000
+<v Mac>Something simple. What's working? What's one thing that would make this stronger? The format matters less than the practice. The goal is for everyone to get used to giving and receiving feedback in a low-stakes environment.
+
+00:08:10.300 --> 00:08:15.000
+<v Jordan>Will these sessions be mandatory? Some people are more comfortable with public feedback than others.
+
+00:08:15.400 --> 00:08:23.000
+<v Mac>I'll ask everyone to participate but nobody has to put up work they're not ready to share. The first session should be light — something like a one-page brief rather than a full spec. I'll model it by going first and putting my own work up.
+
+00:08:23.300 --> 00:08:28.000
+<v Jordan>That helps. If you're willing to be the first to get feedback that sets a safe tone.
+
+00:08:28.400 --> 00:08:34.000
+<v Mac>That's the intent. I don't ask anyone to do something I'm not willing to do myself. We'll run the first session in week six — I'll put it on the calendar.
+
+00:08:34.300 --> 00:08:40.000
+<v Mac>Okay, quick check — competitive summaries. Last week I asked each team for a one-paragraph competitive summary by today. Did we do the homework?
+
+00:08:40.300 --> 00:08:45.000
+<v Priya>Sign's is in the shared Notion doc. Two paragraphs on Sigstore and Azure Trusted Signing.
+
+00:08:45.400 --> 00:08:50.000
+<v Lena>Scan's is there too. Snyk and Grype. I leaned into where we're ahead and where we're behind.
+
+00:08:50.300 --> 00:08:55.000
+<v Omar>Release has one paragraph on GitHub and one on GitLab. I was surprised by how much GitLab's deployment features have grown in the last year.
+
+00:08:55.400 --> 00:08:59.000
+<v Diana>Licensing posted ours. The competitive landscape for licensing management is mostly fragmented — it's internal tools or Salesforce. Which is an opportunity.
+
+00:08:59.300 --> 00:09:05.000
+<v Mac>Excellent. Homework completed. I'll read all four this week and add comments. What I want to do with these going forward is build them into a quarterly competitive brief — one document that any PM on the team can reference.
+
+00:09:05.400 --> 00:09:10.000
+<v Theo>Should we be monitoring competitors more systematically? Like tracking their release notes or changelogs?
+
+00:09:10.300 --> 00:09:19.000
+<v Mac>Yes. I want one person per team to own competitive tracking for your area. That doesn't mean reading every announcement — it means a monthly thirty-minute scan of their product updates and surfacing anything significant to the team. Can each lead identify that person?
+
+00:09:19.400 --> 00:09:23.000
+<v Lena>Theo — you did a great job on the competitive analysis for false positive reduction. Would you want to own this for Scan?
+
+00:09:23.300 --> 00:09:27.000
+<v Theo>Yeah, I'm into that. I find competitive analysis interesting.
+
+00:09:27.400 --> 00:09:30.000
+<v Mac>Love it when people want to own things. Priya, Omar, Diana — figure out who owns it for your teams and let me know by end of week.
+
+00:09:30.300 --> 00:09:36.000
+<v Mac>Quick team updates then we'll wrap. Fatima, let's start with you since you've been the quiet one today.
+
+00:09:36.400 --> 00:09:44.000
+<v Fatima>The cert expiry warning shipped in staging this week. We used the "a signing failure is thirty days away" copy that Mac suggested last week. Design says the user testing feedback has been really positive — customers click the CTA at twice the rate of our normal notification banners.
+
+00:09:44.300 --> 00:09:49.000
+<v Mac>Twice the click rate. That's the power of outcome-oriented copy. Good work.
+
+00:09:49.400 --> 00:09:55.000
+<v Fatima>Also, Mac — taking on the developer experience scope formally. I've started a discovery sprint with two customers who mentioned the certificate policy editor confusion. I have a clearer picture now of what the wizard needs to solve.
+
+00:09:55.300 --> 00:10:00.000
+<v Mac>That's great initiative Fatima. We'll formalize the scope in your next one-on-one. Jordan?
+
+00:10:00.400 --> 00:10:07.000
+<v Jordan>Webhook delivery is built and in QA. We found one edge case — when a signing job times out before completion, the webhook wasn't firing. Fixed now. On track to ship next sprint.
+
+00:10:07.300 --> 00:10:15.000
+<v Mac>Good catch in QA. That's exactly the kind of edge case that would have been a support ticket if it slipped through. Theo?
+
+00:10:15.400 --> 00:10:23.000
+<v Theo>Govulncheck spike complete. Recommendation is to integrate. The integration surface is clean, the Apache 2.0 license is unambiguous, and our initial testing shows false positives drop by about forty percent for Go packages.
+
+00:10:23.300 --> 00:10:28.000
+<v Mac>Forty percent reduction. That's a strong result from a spike. How long to build the integration?
+
+00:10:28.400 --> 00:10:32.000
+<v Theo>Three sprints. Lena has approved starting next cycle.
+
+00:10:32.300 --> 00:10:36.000
+<v Lena>Yes. And Theo did a great job on the spike doc. Very clear recommendation with supporting data.
+
+00:10:36.400 --> 00:10:43.000
+<v Mac>That's the standard for spike work. A clear go or no-go recommendation with data. Nice. Amara?
+
+00:10:43.400 --> 00:10:50.000
+<v Amara>The policy engine template gallery is live in staging. Five templates: SLSA Level 2, SOC2 deployment control, PCI DSS artifact verification, HIPAA audit trail, and a custom starter. Getting UX review this week.
+
+00:10:50.300 --> 00:10:55.000
+<v Mac>Those templates are going to move the adoption needle significantly. Good work. Yuki?
+
+00:10:55.400 --> 00:11:02.000
+<v Yuki>License transfer wireframes got great feedback from the two customer previews. One customer said — and I'm quoting — "I can't believe this doesn't exist already." We're moving to engineering handoff next week.
+
+00:11:02.300 --> 00:11:06.000
+<v Mac>A customer quote like that is worth putting in your portfolio. Write it down. Ben?
+
+00:11:06.400 --> 00:11:14.000
+<v Ben>Contract management spec is drafted. Five customer interviews done. The job-to-be-done is crystal clear: customers need to know when to act on their renewal and what they need to do. The spec centers the product on that moment.
+
+00:11:14.300 --> 00:11:18.000
+<v Mac>Good. I want to read the spec this week. Send it to me.
+
+00:11:18.400 --> 00:11:23.000
+<v Raj>Release — environment dependencies feature passed design review. Engineering estimates two sprints. Chloe?
+
+00:11:23.300 --> 00:11:30.000
+<v Chloe>Multi-region design doc got approval from Raza. The failure mode analysis was specifically called out as thorough. Omar did great work on that.
+
+00:11:30.400 --> 00:11:34.000
+<v Omar>The team did it. I mostly asked questions.
+
+00:11:34.300 --> 00:11:41.000
+<v Mac>Good PMs ask the questions that make the team think harder. Don't undersell it Omar. Alright — great session. Strategic narrative dry run is in two weeks. Executive presentation is end of month. Everyone's in good shape. See you next Wednesday.
+
+00:11:41.400 --> 00:11:45.000
+<v Fatima>Thanks Mac. Feels like things are clicking.
+
+00:11:45.300 --> 00:11:48.000
+<v Raj>Good session. See you next week.

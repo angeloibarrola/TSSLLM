@@ -1,0 +1,249 @@
+WEBVTT
+
+NOTE
+PM Team Meeting — Week 1
+Date: Wednesday, February 5, 2025
+Attendees: Mac (PM Manager), Priya (Sign Lead), Jordan (Sign), Fatima (Sign), Lena (Scan Lead), Theo (Scan), Amara (Scan), Omar (Release Lead), Chloe (Release), Raj (Release), Diana (Licensing Lead), Yuki (Licensing), Ben (Licensing)
+
+00:00:00.000 --> 00:00:08.000
+<v Mac>Good morning everyone. Happy first Wednesday of February. I want to start by just checking in — we're coming off a heavy Q4 close and I know several of you were deep in planning docs and roadmap negotiations through most of January. How is everyone actually doing?
+
+00:00:08.300 --> 00:00:12.000
+<v Chloe>Tired but energized. January felt like running uphill but we got through it.
+
+00:00:12.300 --> 00:00:16.000
+<v Jordan>Same honestly. The roadmap negotiations with engineering were intense this cycle.
+
+00:00:16.400 --> 00:00:21.000
+<v Mac>I heard that from a few of you. I want to spend a few minutes on planning process today actually — because I think there are things we can do differently next cycle. But let me get through the leadership update first because there are a few things you need to know before they hit the broader org.
+
+00:00:21.300 --> 00:00:25.000
+<v Lena>That sounds ominous Mac.
+
+00:00:25.400 --> 00:00:36.000
+<v Mac>It's not bad news but it's real news. So — I had my skip with Stuart and Raza on Monday. Two things came out of that conversation I want to share. First: headcount for the PM org is being reviewed as part of the broader company planning cycle. Nothing has been decided, nothing is being cut, but the framing coming from finance is that every org needs to justify its current size and any growth asks against revenue projections.
+
+00:00:36.300 --> 00:00:40.000
+<v Diana>Justify current size — does that mean we could lose headcount, or just that new hires are on hold?
+
+00:00:40.400 --> 00:00:50.000
+<v Mac>Honestly both scenarios are on the table at the company level. Within our org specifically, Stuart is going to bat for maintaining what we have. But I want you to know the environment we're operating in. We should assume any growth ask we make needs a very tight business case behind it.
+
+00:00:50.300 --> 00:00:55.000
+<v Omar>This is the first time headcount has been framed this way in a while. Is this a response to something specific — a revenue miss?
+
+00:00:55.400 --> 00:01:05.000
+<v Mac>Q4 came in slightly below projection — not dramatically, but enough that the executive team wants to be more conservative heading into Q1. The underlying business is healthy. ARR is growing. This is a discipline exercise more than a crisis.
+
+00:01:05.300 --> 00:01:09.000
+<v Priya>What does that mean for the Sign team's ask for a PM to cover the developer experience workstream? I submitted that req last month.
+
+00:01:09.400 --> 00:01:18.000
+<v Mac>That req is still in flight but it's going to need more justification than "the team is stretched." I need to connect it to revenue impact. What does adding that PM unlock? What deals does it help us win? I'll work with you Priya on building that case.
+
+00:01:18.300 --> 00:01:23.000
+<v Priya>Okay. I'll pull together the customer feedback data on the developer experience gaps. There's a direct line to conversion there.
+
+00:01:23.400 --> 00:01:28.000
+<v Mac>That's exactly the framing we need. Alright — second thing from my skip. Stuart wants each product area to present a six-month strategic narrative to the leadership team by end of February. Not a roadmap readout — a narrative. Where is this product area going, why does it matter, what would success look like in six months.
+
+00:01:28.300 --> 00:01:33.000
+<v Lena>What format? A deck? A doc?
+
+00:01:33.400 --> 00:01:40.000
+<v Mac>A short deck. Five to seven slides. I'll share a template by end of week. The four of you — Priya, Lena, Omar, Diana — are the owners of your respective narratives. Your PMs should be collaborators on the thinking, not just observers. I want these to feel like they came from the whole team.
+
+00:01:40.300 --> 00:01:45.000
+<v Omar>When do you need a draft from us?
+
+00:01:45.400 --> 00:01:51.000
+<v Mac>I want to see a first pass by February nineteenth. That gives us a week to refine before the end of month presentation. We'll use one of our team meetings to do a dry run. More on that in a few weeks.
+
+00:01:51.300 --> 00:01:55.000
+<v Ben>Mac, is the strategic narrative presentation separate from the Q4 review we did with Raza?
+
+00:01:55.400 --> 00:02:03.000
+<v Mac>Good question. Yes — separate audience, separate framing. The Q4 review was operational — what did we ship, what did we miss. The strategic narrative is forward-looking and goes to the executive team, not just engineering leadership.
+
+00:02:03.300 --> 00:02:07.000
+<v Ben>Got it. That's a higher stakes audience.
+
+00:02:07.400 --> 00:02:15.000
+<v Mac>It is. And that's a growth opportunity for the area leads. Stuart will be in the room. Use it well. Okay — I want to shift to something I've been thinking about since our planning cycle. I want to talk about how we're operating cross-functionally.
+
+00:02:15.300 --> 00:02:20.000
+<v Amara>Is this about the Sign-Scan overlap thing? Because I've been wanting to raise that.
+
+00:02:20.400 --> 00:02:28.000
+<v Mac>It's partly about that, yes. Tell me what you're seeing Amara.
+
+00:02:28.300 --> 00:02:39.000
+<v Amara>So the SBOM generation feature — Lena's team is building SBOM generation as part of the Scan workflow. But a customer asked us in a Scan review call whether the SBOMs would be signed. And I said yes, because I assumed the Sign team would handle that integration. And then I found out we haven't actually talked to the Sign team about this at all.
+
+00:02:39.300 --> 00:02:44.000
+<v Priya>We didn't know SBOM signing was a requirement. Nobody looped us in.
+
+00:02:44.400 --> 00:02:50.000
+<v Amara>I know. And that's the problem. I told a customer something I didn't verify. It was an assumption gap.
+
+00:02:50.300 --> 00:02:58.000
+<v Mac>Okay. I appreciate you naming this. Let me reflect it back for the group. What happened here is a symptom of a broader pattern: our teams are building adjacent things and the PMs aren't talking to each other frequently enough to catch these dependencies before they become customer-facing surprises. Does that resonate?
+
+00:02:58.300 --> 00:03:02.000
+<v Raj>Yeah. Same thing happens between Release and Licensing. I was building out the audit trail for deployment approvals and I didn't know Diana's team needed that same audit trail for license compliance. We built two separate things.
+
+00:03:02.300 --> 00:03:07.000
+<v Diana>I heard about the compliance report conversation between Omar and me — but that came out of the Q4 review. It should have surfaced six weeks earlier.
+
+00:03:07.400 --> 00:03:17.000
+<v Mac>Right. And I'll take some accountability here too — I haven't been explicit enough about creating the structures for cross-team PM coordination. Starting this month I want each area lead to have a standing thirty minute monthly sync with the leads of adjacent teams. Priya and Lena — Sign and Scan are obviously tightly coupled. Omar and Diana — you've already found one overlap this quarter, there are probably more.
+
+00:03:17.300 --> 00:03:21.000
+<v Omar>I'm down for that. Diana and I work well together.
+
+00:03:21.400 --> 00:03:24.000
+<v Diana>Same. We should have been doing this already.
+
+00:03:24.300 --> 00:03:31.000
+<v Mac>Beyond the area leads, I also want the individual PMs to have visibility into what adjacent teams are building. I'm going to ask each team to share their one-page roadmap summary in our team Notion once a month. Not a full doc — just enough context that if you hear a customer ask about something that touches another team, you know what's happening.
+
+00:03:31.300 --> 00:03:36.000
+<v Fatima>Will we have time to actually read those? I feel like we already have more reading than time.
+
+00:03:36.400 --> 00:03:44.000
+<v Mac>That's a fair push back Fatima. Here's my expectation — I'm not asking you to deep-read four team roadmaps. I'm asking you to skim them once a month so you're not caught flat-footed in a customer call. The accountability isn't deep knowledge — it's situational awareness.
+
+00:03:44.300 --> 00:03:49.000
+<v Fatima>Okay. That framing helps. Skimming I can do.
+
+00:03:49.400 --> 00:03:56.000
+<v Mac>Good. Let me shift to something a little more personal. I want to spend a few minutes on career stuff today. It's February, which means we're one month into performance review cycle. I want to surface something I've been thinking about as I prep your midyear check-ins.
+
+00:03:56.300 --> 00:04:01.000
+<v Yuki>Is this about the new leveling rubric? HR sent something last week and I genuinely didn't understand half of it.
+
+00:04:01.400 --> 00:04:11.000
+<v Mac>Yes, partly. So HR has updated the PM leveling rubric and the main change is that influence and strategic impact are now explicitly weighted more heavily at the senior PM and above levels. What that means in practice: the bar for senior isn't just execution excellence anymore. Stuart wants to see PMs who are shaping direction, not just delivering roadmaps.
+
+00:04:11.300 --> 00:04:16.000
+<v Theo>What does shaping direction mean concretely? That feels abstract.
+
+00:04:16.400 --> 00:04:27.000
+<v Mac>Good question — I'll give you a concrete example. Theo, you're working on the false positive reduction initiative on Scan. Executing on that initiative — defining acceptance criteria, working with engineering on the approach, shipping it — that's strong senior-level execution. Shaping direction would be: you bring a point of view about where the industry is going with vulnerability intelligence, you make a recommendation to Lena and to me about whether we should build, integrate, or partner — and you make that recommendation with data and conviction, not just options.
+
+00:04:27.300 --> 00:04:32.000
+<v Theo>So it's the recommendation layer, not just the analysis layer.
+
+00:04:32.400 --> 00:04:40.000
+<v Mac>Exactly. I want PMs at the senior level and above to have opinions. Informed, well-reasoned opinions that they're willing to defend. I'm going to be pushing all of you on this over the next two quarters.
+
+00:04:40.300 --> 00:04:46.000
+<v Jordan>I want to ask about promotion timelines. I'm aiming for senior this year and I want to understand what the path looks like from your perspective.
+
+00:04:46.400 --> 00:04:56.000
+<v Mac>Jordan, let's do this properly in your one on one — I want to give you real time and not do your career conversation in a team setting. But I'll say this publicly: the right question to ask yourself is not "have I done enough to check the boxes" — it's "can I point to moments where I changed the direction of something meaningful?" Those are the moments that show up in promo packets.
+
+00:04:56.300 --> 00:05:01.000
+<v Jordan>That's helpful framing. I'll bring specific examples to our one on one.
+
+00:05:01.400 --> 00:05:07.000
+<v Mac>Good. I want to hear the examples. Okay — let me cover one more thing before we get to team updates. Team culture.
+
+00:05:07.300 --> 00:05:11.000
+<v Chloe>I was wondering when we'd get to this. I have something I want to bring up.
+
+00:05:11.400 --> 00:05:15.000
+<v Mac>Let me go first and then I want to hear from you Chloe. Something I've been noticing lately — and I say this with care — is that some of you are doing the meeting dance. You know what I mean: you attend a meeting, you take notes, you're present but not contributing. I want to name that and I'm not pointing fingers at anyone specific.
+
+00:05:15.300 --> 00:05:19.000
+<v Mac>A PM's most visible signal to their stakeholders is whether they show up in meetings with a perspective. Not being combative — having a perspective. If you're in a room with engineering and design and you don't say anything, people form impressions. I want you to walk into every meeting with at least one question you want answered and one opinion you're willing to share.
+
+00:05:19.300 --> 00:05:24.000
+<v Raj>Is this about the planning meetings specifically? Because I've been holding back in those because Priya and Lena are the senior voices in the room and I don't want to step on them.
+
+00:05:24.400 --> 00:05:33.000
+<v Mac>Raj, I actually want to reframe that for you. Holding back out of deference is not a virtue — it's a missed opportunity. Priya and Lena being the senior voices doesn't mean there's no room for your voice. It means you need to find your angle: the customer context you have that they might not, the edge case you thought of, the question nobody asked. There's always a contribution to make.
+
+00:05:33.300 --> 00:05:37.000
+<v Priya>For what it's worth — I want to hear from Raj in those sessions. I don't experience it as stepping on me.
+
+00:05:37.400 --> 00:05:42.000
+<v Raj>That's genuinely good to hear. I'll work on it.
+
+00:05:42.300 --> 00:05:47.000
+<v Mac>Chloe, you wanted to bring something up?
+
+00:05:47.400 --> 00:05:58.000
+<v Chloe>Yeah. I want to flag something that's been bothering me. The Release and Scan teams share a lot of the same engineering stakeholders — we both work with Kenji's infra team. And I've noticed that sometimes decisions get made in Scan-Infra conversations that affect the Release pipeline and nobody tells us. Last month there was a change to the event bus that Lena's team requested and it changed a behavior that Release depends on.
+
+00:05:58.300 --> 00:06:04.000
+<v Lena>I didn't know Release was depending on that behavior. I asked Infra for the change and it was done in a week.
+
+00:06:04.400 --> 00:06:08.000
+<v Chloe>I know you didn't know. That's the problem. There's no mechanism for Infra to say "before I make this change, who else is affected?"
+
+00:06:08.300 --> 00:06:18.000
+<v Mac>This is a real process gap and I think it lives between the PM and engineering domains. Kenji's team is responding to whoever files the ticket. They're not expected to understand all the downstream dependencies — that's a PM responsibility. Chloe, Lena — this is a case where you two need a shared view of the infra changes that touch both of your products.
+
+00:06:18.300 --> 00:06:23.000
+<v Lena>Agreed. Can we propose a shared infra change review? Not a gate, just a visibility mechanism.
+
+00:06:23.400 --> 00:06:30.000
+<v Mac>Yes. Bring a proposal to me by next week and we'll see if it makes sense to formalize it. It might be as simple as a shared Slack channel where Infra posts their planned changes weekly.
+
+00:06:30.300 --> 00:06:34.000
+<v Chloe>A weekly changes digest from Infra would actually solve ninety percent of the problem.
+
+00:06:34.400 --> 00:06:39.000
+<v Mac>Then let's get that set up. Good catch Chloe. Alright, team updates — let's go around. Two minutes per team, just the highlights. Priya?
+
+00:06:39.300 --> 00:06:48.000
+<v Priya>Sign is heads down on key rotation GA. Beta is live with two customers and feedback is positive. The main thing we're monitoring is the rollback story — we're shipping that in Q4 week two. Developer experience wizard is in the design queue pending the headcount conversation Mac and I are going to have.
+
+00:06:48.300 --> 00:06:52.000
+<v Mac>Good. Lena?
+
+00:06:52.400 --> 00:07:02.000
+<v Lena>Scan is starting the DB client refactor this sprint. We did the test quality sprint last week and surfaced six flaky integration tests that needed fixes before we could start the refactor. Those are fixed. False positive reduction initiative — Theo is writing the spike doc for govulncheck integration.
+
+00:07:02.300 --> 00:07:06.000
+<v Mac>Omar?
+
+00:07:06.400 --> 00:07:16.000
+<v Omar>Release shipped safe rollback to GA this week. Customer who had the incident in Q3 has already turned it on. Multi-region design doc is in draft. I'm blocking two days this week to finish it. ServiceNow integration scoping starts next sprint.
+
+00:07:16.300 --> 00:07:19.000
+<v Mac>Diana?
+
+00:07:19.400 --> 00:07:29.000
+<v Diana>Licensing has the billing reconciliation system running in production for one week with no anomalies. License transfer self-service is in design. The Infra event bus fix shipped Monday — metering pipeline is now dropping zero events. That was a big unblock.
+
+00:07:29.300 --> 00:07:35.000
+<v Mac>Good progress across the board. Thank you Diana for flagging the event bus with me directly — the escalation worked. Okay, last thing before I let you go.
+
+00:07:35.400 --> 00:07:44.000
+<v Mac>I want to share something I've been reading that I think is relevant to all of us. There's a concept called the "PM as GM" framing — the idea that a great PM acts like a general manager of a business within a business: owns the P&L thinking, owns the customer relationship, owns the strategy, and is accountable for outcomes not just outputs. I think our team is very good at outputs. We ship things. What I want to challenge you on in 2025 is outcomes. Not "did we ship the feature" — "did the feature change something we care about."
+
+00:07:44.300 --> 00:07:49.000
+<v Amara>How do we measure that when the sales cycle is long? Some of our features take six months to show up in renewal decisions.
+
+00:07:49.400 --> 00:07:58.000
+<v Mac>That's a great point and it means we need to be deliberate about what our leading indicators are. You can't always wait for the revenue outcome. What's the behavior change you'd expect to see in thirty days if the feature is working? Define that upfront. That's the PM work that happens before a feature ships, not after.
+
+00:07:58.300 --> 00:08:04.000
+<v Fatima>So we need success metrics defined before the feature ships, not derived from whatever data is available after.
+
+00:08:04.400 --> 00:08:11.000
+<v Mac>Exactly. I'm going to start asking you in roadmap reviews: what's the thirty-day signal that tells you this is working? If you can't answer that, the feature isn't ready to commit.
+
+00:08:11.300 --> 00:08:16.000
+<v Ben>That's a different kind of accountability than I've been used to. I like it.
+
+00:08:16.400 --> 00:08:24.000
+<v Mac>Good. That's the standard I want us building toward. Alright — that's our first week. Thanks everyone. Strong energy in this group. See you next Wednesday.
+
+00:08:24.300 --> 00:08:28.000
+<v Priya>Thanks Mac. Good session.
+
+00:08:28.300 --> 00:08:31.000
+<v Omar>See everyone next week.

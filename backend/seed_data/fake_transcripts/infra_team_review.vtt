@@ -1,0 +1,373 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+<v Raza>Okay Infra team, Q3 product review. Kenji, you're leading?
+
+00:00:05.300 --> 00:00:09.000
+<v Kenji>Yes. I'll give you the straight picture. Some of it is not pretty.
+
+00:00:09.400 --> 00:00:13.000
+<v Stuart>I appreciate that framing. Let's hear it.
+
+00:00:13.400 --> 00:00:24.000
+<v Kenji>Q3 goals were four things: ship the new job framework, get overall system uptime to 99.9 percent or better, cut infrastructure costs by fifteen percent, and complete the Kubernetes migration for the last three legacy services. We hit two of those four.
+
+00:00:24.300 --> 00:00:28.000
+<v Raza>Which two did we hit?
+
+00:00:28.400 --> 00:00:35.000
+<v Kenji>Job framework shipped and is in use by two product teams already. Infrastructure cost reduction — we hit seventeen percent, beating the target. The misses are uptime and the Kubernetes migration.
+
+00:00:35.300 --> 00:00:40.000
+<v Raza>Uptime miss — we didn't hit 99.9?
+
+00:00:40.400 --> 00:00:50.000
+<v Kenji>We landed at 99.71 percent. That's about two hours of unplanned downtime this quarter across all services. Three incidents contributed to that.
+
+00:00:50.300 --> 00:00:55.000
+<v Raza>Walk me through the three incidents.
+
+00:00:55.400 --> 00:01:07.000
+<v Kenji>First incident was the database connection pool exhaustion the Release team caused — that one's on their code but we didn't have the monitoring to detect it early. We saw it in customer error rates before we saw it in our infra dashboards. That's a detection gap we've fixed.
+
+00:01:07.300 --> 00:01:12.000
+<v Raza>What did you fix on the detection side?
+
+00:01:12.400 --> 00:01:22.000
+<v Kenji>We added connection pool saturation as an alert condition at seventy percent and ninety percent thresholds. At seventy percent we get a warning. At ninety percent we get a page. We also added it to the main SRE dashboard.
+
+00:01:22.300 --> 00:01:26.000
+<v Raza>Good. What was incident two?
+
+00:01:26.400 --> 00:01:37.000
+<v Kenji>Second incident was a DNS misconfiguration during a routine routing update. We pointed a load balancer record at the wrong backend and about twelve percent of traffic was going to a service that wasn't expecting it. About twenty-two minutes before we caught it.
+
+00:01:37.300 --> 00:01:43.000
+<v Raza>Twenty-two minutes to catch a DNS misconfiguration. What's the process failure?
+
+00:01:43.400 --> 00:01:54.000
+<v Kenji>We do DNS changes manually and the engineer who made the change didn't run our validation script beforehand. The script would have caught it. We've since made the script a required gate in our change management runbook.
+
+00:01:54.300 --> 00:01:59.000
+<v Raza>A required gate meaning it literally cannot be skipped?
+
+00:01:59.400 --> 00:02:07.000
+<v Kenji>Not technically enforced yet — it's policy. We're building automation to enforce it in Q4. But the engineer in question knows what happened and it won't happen again.
+
+00:02:07.300 --> 00:02:13.000
+<v Raza>Policy is not sufficient for a production change management gate. Build the automation. Don't rely on people remembering.
+
+00:02:13.400 --> 00:02:18.000
+<v Kenji>Agreed. That's Q4 week one for me personally.
+
+00:02:18.300 --> 00:02:22.000
+<v Raza>Good. Third incident?
+
+00:02:22.400 --> 00:02:34.000
+<v Kenji>Third one is the most concerning. We had a storage volume fill up on our metrics ingestion pipeline. When the volume hit capacity, metric writes started failing silently. We had a four-hour window where we thought systems were healthy but the health data itself wasn't being recorded.
+
+00:02:34.300 --> 00:02:39.000
+<v Raza>Silent failures in a monitoring system. That's the worst possible failure mode.
+
+00:02:39.400 --> 00:02:47.000
+<v Kenji>I know. The irony is we didn't know the monitoring was broken because the monitoring was broken. We only found out when an engineer noticed staleness in a dashboard.
+
+00:02:47.300 --> 00:02:53.000
+<v Raza>Was there customer impact during those four hours?
+
+00:02:53.400 --> 00:03:02.000
+<v Kenji>No observable customer impact. We got lucky. If a real incident had happened in that window we would have been flying blind. Four hours without monitoring is not acceptable for a production system.
+
+00:03:02.300 --> 00:03:08.000
+<v Stuart>This is a meta-monitoring problem. You need to monitor your monitoring.
+
+00:03:08.400 --> 00:03:18.000
+<v Kenji>Exactly. We've added a dead man's switch — a synthetic heartbeat that writes a test metric every minute. If we don't see that metric arrive, we get paged. If the monitoring system itself is down, the absence of the heartbeat is the alert.
+
+00:03:18.300 --> 00:03:23.000
+<v Raza>Smart. When did that go live?
+
+00:03:23.400 --> 00:03:27.000
+<v Kenji>Two weeks ago. It's been running cleanly.
+
+00:03:27.300 --> 00:03:33.000
+<v Raza>Good. Also, why was a production storage volume able to fill up without alerting? Where were the capacity alerts?
+
+00:03:33.400 --> 00:03:42.000
+<v Kenji>We had an alert at ninety percent. The volume went from sixty percent to one hundred percent in about three hours — faster than our retention policy could clean up old data. The alert fired but by the time the on-call engineer acknowledged it, we were already at capacity.
+
+00:03:42.300 --> 00:03:48.000
+<v Raza>Why did it grow so fast?
+
+00:03:48.400 --> 00:03:58.000
+<v Kenji>Unusual spike in metric cardinality. The Release team shipped a change that added per-user labels to a high-frequency metric. Every user became a unique time series. Volume exploded.
+
+00:03:58.300 --> 00:04:05.000
+<v Raza>So a product team change caused an infrastructure incident without knowing it. This is a cardinality governance problem.
+
+00:04:05.400 --> 00:04:15.000
+<v Kenji>Yes. We need a cardinality gate before metrics reach production. Any metric with unbounded label values — user IDs, request IDs — should require Infra review before it ships.
+
+00:04:15.300 --> 00:04:21.000
+<v Raza>How do we implement that without creating a bottleneck for every product team that wants to add a metric?
+
+00:04:21.400 --> 00:04:31.000
+<v Kenji>Static analysis in the CI pipeline. We can write a linter that detects high-cardinality label patterns in metric definitions and flags them for review. Low cardinality metrics — static labels, small enumerations — pass through automatically.
+
+00:04:31.300 --> 00:04:36.000
+<v Raza>That's the right approach. When can you have the linter built?
+
+00:04:36.400 --> 00:04:41.000
+<v Kenji>Three weeks. It's not complex, just needs careful rule definition.
+
+00:04:41.300 --> 00:04:47.000
+<v Stuart>Let's talk about the things that went well. Seventeen percent cost reduction is significant. How did you achieve that?
+
+00:04:47.400 --> 00:04:59.000
+<v Kenji>Three initiatives. Right-sizing — we did an audit of every EC2 and compute instance and found significant over-provisioning. Moved about thirty services to smaller instance types without any performance impact. That alone was eight percent.
+
+00:04:59.300 --> 00:05:04.000
+<v Stuart>Eight percent from right-sizing alone. What were the other two?
+
+00:05:04.400 --> 00:05:14.000
+<v Kenji>Spot instance migration for non-critical batch workloads — our scan worker fleet and the build runner fleet are now on spots. That's another six percent. Third was storage tier optimization — moved data older than ninety days to cold storage. Three percent.
+
+00:05:14.300 --> 00:05:20.000
+<v Raza>What's the headroom? Can we get another fifteen percent next quarter?
+
+00:05:20.400 --> 00:05:29.000
+<v Kenji>The easy wins are gone. The next tranche is harder — reserved instance commitments, architectural changes, potentially multi-cloud arbitrage. I'd target ten percent for Q4 as a realistic number.
+
+00:05:29.300 --> 00:05:35.000
+<v Stuart>Ten percent is still meaningful. What's the architectural change path?
+
+00:05:35.400 --> 00:05:46.000
+<v Kenji>There are three services that run expensive compute continuously but have very bursty traffic patterns. Moving them to serverless would mean we only pay during active traffic. Potentially thirty to forty percent cost reduction for those specific services.
+
+00:05:46.300 --> 00:05:52.000
+<v Raza>Which services?
+
+00:05:52.400 --> 00:06:02.000
+<v Kenji>The Licensing notification service, the SBOM generation worker, and the audit log aggregator. All three have predictable idle periods — nights and weekends mostly.
+
+00:06:02.300 --> 00:06:08.000
+<v Raza>Serverless migration has cold start latency implications. Is that acceptable for these services?
+
+00:06:08.400 --> 00:06:17.000
+<v Kenji>For Licensing notifications and audit log aggregation — yes, a few hundred milliseconds of cold start is fine. For SBOM generation — potentially not, depends on the customer's pipeline timeout.
+
+00:06:17.300 --> 00:06:22.000
+<v Raza>Let's do a spike on SBOM generation before committing. The other two — proceed with the migration.
+
+00:06:22.400 --> 00:06:27.000
+<v Kenji>Noted. I'll kick off those two in Q4 and do the spike on SBOM generation in parallel.
+
+00:06:27.300 --> 00:06:34.000
+<v Stuart>Now the Kubernetes migration — you missed it. What happened?
+
+00:06:34.400 --> 00:06:46.000
+<v Kenji>The three remaining legacy services are complicated. Two of them have stateful components — they're writing to local disk — and migrating stateful workloads to Kubernetes requires a storage strategy rethink. We underestimated that when we committed to Q3.
+
+00:06:46.300 --> 00:06:52.000
+<v Raza>Stateful workloads on Kubernetes — what's the storage strategy you need?
+
+00:06:52.400 --> 00:07:02.000
+<v Kenji>We're evaluating Persistent Volume Claims with EBS for one service and moving to an external managed database for the second. The PVC path is straightforward. The database migration requires coordination with the owning product team.
+
+00:07:02.300 --> 00:07:08.000
+<v Raza>Which product team owns the second service?
+
+00:07:08.400 --> 00:07:13.000
+<v Kenji>The Release team. It's an older component of their pipeline execution engine.
+
+00:07:13.300 --> 00:07:19.000
+<v Raza>Omar knows about this?
+
+00:07:19.400 --> 00:07:26.000
+<v Kenji>He knows about the migration but we haven't aligned on the database migration work yet. It needs to go on their Q4 roadmap too.
+
+00:07:26.300 --> 00:07:32.000
+<v Raza>I'll flag it for Omar when I talk to him today. These cross-team dependencies need to be in both teams' roadmaps explicitly.
+
+00:07:32.400 --> 00:07:37.000
+<v Kenji>Agreed. I'll send Omar a written handoff doc by end of day.
+
+00:07:37.300 --> 00:07:44.000
+<v Stuart>What's the benefit of completing the Kubernetes migration? Why does this matter beyond just being on the roadmap?
+
+00:07:44.400 --> 00:07:56.000
+<v Kenji>Operational consistency. Right now we have two operational models — Kubernetes and legacy VMs. Each requires different tooling, different deployment runbooks, different monitoring configuration. Having fifteen services in one model and three in another creates cognitive overhead and increases the chance of operational mistakes.
+
+00:07:56.300 --> 00:08:02.000
+<v Stuart>So it's a reliability and operational efficiency play. Not directly customer-facing.
+
+00:08:02.400 --> 00:08:08.000
+<v Kenji>Correct. Customers don't care what it runs on. But our engineers do, and the inconsistency causes real incidents.
+
+00:08:08.300 --> 00:08:14.000
+<v Raza>I support completing the migration. Let's get it done in Q4. Give me a realistic commitment.
+
+00:08:14.400 --> 00:08:20.000
+<v Kenji>One service — the PVC path — by Q4 week six. The second requires the Release team's cooperation so I can't commit without Omar's input.
+
+00:08:20.300 --> 00:08:25.000
+<v Raza>Fair. I'll get you Omar's answer today.
+
+00:08:25.300 --> 00:08:33.000
+<v Stuart>Let's talk about the job framework you shipped. I've heard positive things from the Sign team. What's the adoption picture?
+
+00:08:33.400 --> 00:08:44.000
+<v Kenji>Two teams are on it — Sign is using it and an internal data pipeline team. Three more are planning to migrate in Q4 — Scan, Licensing, and one component of Release. The framework is solid. We're getting good feedback.
+
+00:08:44.300 --> 00:08:50.000
+<v Stuart>Is there anything blocking broader adoption?
+
+00:08:50.400 --> 00:09:00.000
+<v Kenji>Documentation is thin. The framework is well-built but the migration guide is sparse. Teams that have adopted it needed significant hand-holding from us. We need a proper migration runbook and self-service documentation.
+
+00:09:00.300 --> 00:09:06.000
+<v Raza>Can you allocate someone to write the documentation?
+
+00:09:06.400 --> 00:09:13.000
+<v Kenji>I can have one engineer spend a week on it. That should produce a solid migration guide.
+
+00:09:13.300 --> 00:09:18.000
+<v Raza>Do it this sprint. Don't let adoption stall because of a docs gap.
+
+00:09:18.400 --> 00:09:23.000
+<v Kenji>I'll assign Priyanka to it starting Monday.
+
+00:09:23.300 --> 00:09:30.000
+<v Stuart>What about the service mesh work I've been hearing about? Is that something that's coming in Q4?
+
+00:09:30.400 --> 00:09:42.000
+<v Kenji>It's on the radar. We've been doing service-to-service auth with static API keys in some internal services — which is not great. A service mesh with mTLS would give us encrypted service-to-service communication and workload identity without manual key management.
+
+00:09:42.300 --> 00:09:48.000
+<v Raza>That aligns with where we want to go with zero-trust internally. What mesh are you considering?
+
+00:09:48.400 --> 00:09:56.000
+<v Kenji>Istio or Linkerd. Istio is more feature-rich but operationally complex. Linkerd is simpler and has less overhead. For our scale, Linkerd is probably the right call.
+
+00:09:56.300 --> 00:10:02.000
+<v Raza>What's the migration path? You can't flip a switch across all services at once.
+
+00:10:02.400 --> 00:10:13.000
+<v Kenji>Phased rollout. Start with two non-critical internal services, prove the operational model, then expand. We'd run both models in parallel during the transition — services in the mesh talk mTLS, services not yet in the mesh fall back to API keys.
+
+00:10:13.300 --> 00:10:19.000
+<v Raza>Is Q4 the right time to start this? It's a significant infrastructure change.
+
+00:10:19.400 --> 00:10:28.000
+<v Kenji>I think Q4 for the spike and first pilot services. Full rollout is a 2026 initiative. If we don't start the pilot this quarter, we push the full rollout to late 2026.
+
+00:10:28.300 --> 00:10:34.000
+<v Raza>Okay. Spike and pilot in Q4, full rollout in plan for Q1. Stuart, any concerns?
+
+00:10:34.400 --> 00:10:40.000
+<v Stuart>My concern is bandwidth. Kenji, your team is already carrying the Kubernetes migration, cost reduction, the DNS automation, the cardinality linter, and now a service mesh pilot.
+
+00:10:40.300 --> 00:10:50.000
+<v Kenji>You're right. I need to be honest about capacity. I have eight engineers. The service mesh pilot is a stretch goal for Q4. If something slips, it's the first thing to move.
+
+00:10:50.300 --> 00:10:56.000
+<v Stuart>I'd rather have a stretch goal that doesn't happen than a commitment that fails.
+
+00:10:56.400 --> 00:11:02.000
+<v Kenji>Fair. I'll label it stretch in the roadmap explicitly.
+
+00:11:02.300 --> 00:11:09.000
+<v Raza>Let's talk about the event bus reliability issue. Diana raised it — the metering pipeline is dropping events because of an aggressive deduplication bug.
+
+00:11:09.400 --> 00:11:18.000
+<v Kenji>I know about that ticket. I'll be straight — it got deprioritized because the bug is causing under-billing, not over-billing. It's a revenue loss not a customer harm.
+
+00:11:18.300 --> 00:11:24.000
+<v Raza>Revenue loss is a legitimate priority. Kenji, I need that fixed this sprint. Not next quarter.
+
+00:11:24.400 --> 00:11:30.000
+<v Kenji>I hear you. It's a two-day fix once someone digs in. I'll pull Dev off their current task to handle it.
+
+00:11:30.300 --> 00:11:35.000
+<v Raza>Thank you. Diana's team has been waiting on this for three weeks. That's too long.
+
+00:11:35.400 --> 00:11:40.000
+<v Kenji>Acknowledged. It should have been prioritized sooner. My bad.
+
+00:11:40.300 --> 00:11:47.000
+<v Stuart>On the HSM console MFA issue that Sign team raised — what's the timeline?
+
+00:11:47.400 --> 00:11:55.000
+<v Kenji>That's in progress. We're using our internal SSO provider to add MFA to the HSM admin console. It's about a week of work. Should ship by end of this month.
+
+00:11:55.300 --> 00:12:01.000
+<v Stuart>Good. That was a pentest finding and it needs to close before Q4 planning.
+
+00:12:01.400 --> 00:12:07.000
+<v Kenji>It'll be closed. I have it as a hard deadline for this sprint.
+
+00:12:07.300 --> 00:12:14.000
+<v Raza>What does the on-call rotation look like? I want to make sure we're not burning out a small number of engineers.
+
+00:12:14.400 --> 00:12:24.000
+<v Kenji>We have seven engineers in the on-call rotation — I've pulled myself out recently because I've been heads down in architecture work. Average on-call shifts are about every seven weeks per person. That's acceptable.
+
+00:12:24.300 --> 00:12:30.000
+<v Raza>Seven week rotation is reasonable. Are the on-call runbooks up to date?
+
+00:12:30.400 --> 00:12:38.000
+<v Kenji>Mostly. We did a runbook review in August. Three runbooks needed updating after the incidents and we updated them. There are two runbooks for legacy services that I'm not confident are accurate anymore.
+
+00:12:38.300 --> 00:12:43.000
+<v Raza>Flag those two as tech debt. Get them reviewed before the Kubernetes migration completes — I don't want outdated runbooks for services we're about to migrate.
+
+00:12:43.400 --> 00:12:48.000
+<v Kenji>Already on my list. I'll do a runbook audit the week before we start the first migration.
+
+00:12:48.300 --> 00:12:56.000
+<v Stuart>Kenji, one more thing. A few product teams have mentioned they're waiting for Infra to provision environments for testing. There's a sense that the turnaround time is too long.
+
+00:12:56.400 --> 00:13:07.000
+<v Kenji>The average environment provisioning time is about three days right now. Before the Kubernetes migration, each environment was a manual VM setup. Now for Kubernetes services, it's mostly automated — more like four hours.
+
+00:13:07.300 --> 00:13:13.000
+<v Stuart>Three days for a test environment is too long. It's blocking product teams from moving fast.
+
+00:13:13.400 --> 00:13:23.000
+<v Kenji>The three-day services are the legacy VMs. Once the Kubernetes migration is complete, that problem mostly goes away. But I can also build a self-service environment provisioning interface for the Kubernetes services so teams don't have to file a ticket with us.
+
+00:13:23.300 --> 00:13:29.000
+<v Stuart>Self-service environment provisioning would be a massive quality-of-life improvement for every product team.
+
+00:13:29.400 --> 00:13:36.000
+<v Kenji>It's about three weeks of work. It's been on my personal wishlist for a while.
+
+00:13:36.300 --> 00:13:41.000
+<v Raza>That's a force multiplier for the entire engineering organization. Add it to Q4 as a high priority.
+
+00:13:41.400 --> 00:13:46.000
+<v Kenji>Will do. I'll scope it against the other Q4 work and find the slot.
+
+00:13:46.300 --> 00:13:55.000
+<v Raza>Alright. Summary for Infra Q4: uptime target 99.9 percent with better monitoring and the dead man's switch running. DNS change automation gate. Cardinality linter in CI. Event bus deduplication bug fixed this sprint. HSM MFA by end of month. Kubernetes migration service one by week six, service two pending Release team alignment. Self-service environment provisioning. Serverless migration for notification and audit services. Service mesh pilot as stretch. Cost reduction target ten percent. Anything missing?
+
+00:13:55.300 --> 00:14:02.000
+<v Kenji>Job framework documentation sprint. And the runbook audit before the migrations.
+
+00:14:02.300 --> 00:14:07.000
+<v Raza>Right. Got both. Stuart, anything to add?
+
+00:14:07.400 --> 00:14:14.000
+<v Stuart>Just that I want a mid-quarter check-in to make sure the uptime target is tracking. After two quarters of misses I want eyes on that metric every two weeks.
+
+00:14:14.300 --> 00:14:19.000
+<v Kenji>I'll add a standing uptime review to our biweekly team sync. You're both welcome to join.
+
+00:14:19.400 --> 00:14:23.000
+<v Raza>I'll join. Thanks Kenji. Good session.
+
+00:14:23.300 --> 00:14:28.000
+<v Stuart>Thanks everyone. Lot of good work happening here. Keep at it.
+
+00:14:28.300 --> 00:14:32.000
+<v Kenji>Appreciate it. Talk soon.

@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     llm_base_url: str = "https://models.inference.ai.azure.com"
     chat_model: str = "gpt-4o"
     embedding_model: str = "text-embedding-3-small"
-    database_url: str = "sqlite:///./tssllm.db"
+    database_url: str = "sqlite:///./tssllm.db"  # overridden by DATABASE_URL env var in Azure
     chroma_persist_dir: str = "./chroma_data"
     upload_dir: str = "./uploads"
     azure_client_id: str = "d3590ed6-52b3-4102-aeff-aad2292ab01c"  # Microsoft Office (first-party)

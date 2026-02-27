@@ -1,4 +1,4 @@
-# TSSLLM — Team Source Studio
+# TSS LLM — Trust and Security Services
 
 A collaborative, NotebookLLM-style web application with three panes for importing sources, asking AI-powered questions, and creating markdown artifacts.
 

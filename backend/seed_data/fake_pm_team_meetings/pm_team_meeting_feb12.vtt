@@ -1,0 +1,327 @@
+WEBVTT
+
+NOTE
+PM Team Meeting — Week 2
+Date: Wednesday, February 12, 2025
+Attendees: Mac (PM Manager), Priya (Sign Lead), Jordan (Sign), Fatima (Sign), Lena (Scan Lead), Theo (Scan), Amara (Scan), Omar (Release Lead), Chloe (Release), Raj (Release), Diana (Licensing Lead), Yuki (Licensing), Ben (Licensing)
+
+00:00:00.000 --> 00:00:07.000
+<v Mac>Good morning. Before I get into the agenda I want to acknowledge something. I know there were a few conversations happening in the background this week about the headcount situation. I've been hearing some anxiety in one-on-ones and I want to address it directly rather than let it fester.
+
+00:00:07.300 --> 00:00:12.000
+<v Yuki>Yeah, there's been a lot of hallway talk. Some people are assuming cuts are coming.
+
+00:00:12.400 --> 00:00:22.000
+<v Mac>I hear you. Here's what I know: as of today, no positions on this team are being eliminated. I will tell you immediately if that changes — and I mean immediately, not after it's finalized, not after HR signs off. You will hear it from me first. That's my commitment to you.
+
+00:00:22.300 --> 00:00:26.000
+<v Theo>What about the open reqs? Jordan mentioned the Sign developer experience PM is on hold.
+
+00:00:26.400 --> 00:00:35.000
+<v Mac>New hires are in a holding pattern while finance finishes its review. That's real and I won't sugarcoat it. The review wraps by March first. We'll know more then. Priya and I are building the business case and I feel good about it, but I can't promise the outcome.
+
+00:00:35.300 --> 00:00:39.000
+<v Priya>For what it's worth the case is strong. We have direct customer feedback tying developer experience gaps to expansion blockers.
+
+00:00:39.400 --> 00:00:45.000
+<v Mac>Priya is right, the data is compelling. Let's do good work and make the case. That's all we can control. What I'd ask of the team is — don't let the uncertainty distract you. The products still need to ship, the customers still need us. If you're spiraling about this, come talk to me one on one. Don't carry it.
+
+00:00:45.300 --> 00:00:49.000
+<v Ben>I appreciate you saying that directly. It actually helps.
+
+00:00:49.400 --> 00:00:55.000
+<v Mac>Good. Okay. Let me shift to something more energizing. Leadership update from this week.
+
+00:00:55.300 --> 00:01:04.000
+<v Mac>Stuart hosted the executive product review yesterday and I was in the room. The theme he kept returning to was this: we have strong products but we're not telling the story of how they fit together. Customers who use Sign and Scan and Release separately don't understand that these products are more powerful as a system. That framing gap is a PM problem, not a marketing problem.
+
+00:01:04.300 --> 00:01:09.000
+<v Omar>Is Stuart talking about a platform narrative? Like a unified pitch?
+
+00:01:09.400 --> 00:01:19.000
+<v Mac>Exactly. He used the phrase "trusted software delivery lifecycle." The idea being: we help teams sign, scan, and release software securely, end to end. Right now each of your product areas tells its own story. Stuart wants a cohesive narrative that connects them.
+
+00:01:19.300 --> 00:01:24.000
+<v Lena>How does that affect the six-month strategic narratives we're working on? Should we be writing to a platform story?
+
+00:01:24.400 --> 00:01:33.000
+<v Mac>Yes. I want each of your six-month narratives to have a slide that explicitly says: here's how our product area connects to the others. Here's what's upstream of us and downstream of us in the customer journey. It doesn't have to be long — one slide. But it needs to be there.
+
+00:01:33.300 --> 00:01:38.000
+<v Diana>Licensing is a bit of an outlier in that narrative. We're not in the delivery pipeline the same way Sign and Scan are.
+
+00:01:38.400 --> 00:01:48.000
+<v Mac>I've thought about that. Here's how I think about Licensing in the platform story: you're the layer that governs who gets access to all of this. Without Licensing, enterprises can't control which teams use which products, can't manage their spend, can't audit access. That's not peripheral — that's the enterprise trust layer. It's actually a compelling angle.
+
+00:01:48.300 --> 00:01:52.000
+<v Diana>I hadn't framed it that way before. That actually makes sense.
+
+00:01:52.400 --> 00:01:57.000
+<v Yuki>It also creates a natural upsell story. You start with one product, you add seats, you expand to more products — Licensing is how you manage all of that.
+
+00:01:57.300 --> 00:02:03.000
+<v Mac>Exactly Yuki. Write that down — that framing should be in the Licensing narrative. Alright.
+
+00:02:03.400 --> 00:02:12.000
+<v Mac>I want to spend some time today on a PM skill I think we're underinvesting in as a team. Discovery. Specifically — how often are you actually talking to customers and what are you doing with those conversations?
+
+00:02:12.300 --> 00:02:18.000
+<v Amara>I do four to five customer calls per month. I document them in Notion but I'll be honest — the documentation sits there and doesn't always drive decisions.
+
+00:02:18.400 --> 00:02:26.000
+<v Mac>That's a really honest answer Amara. And it points to a problem a lot of PMs have — we're good at collecting customer feedback and not as good at synthesizing it into something actionable. What's the bottleneck for you?
+
+00:02:26.300 --> 00:02:33.000
+<v Amara>I don't have a consistent framework for synthesizing across calls. I take notes, I find themes, but then I'm not sure how to translate a theme into a prioritization decision.
+
+00:02:33.400 --> 00:02:44.000
+<v Mac>I want to share something that's been useful for me. I think about customer insights as sitting on a spectrum from pain to job-to-be-done. A pain is "this feature is confusing" — it's real but it's tactical. A job-to-be-done is "I need to prove to my auditors that every release was reviewed before it went to production" — that's a fundamental need that might unlock five different features. The synthesis question is: what job-to-be-done is sitting underneath the pains you're hearing?
+
+00:02:44.300 --> 00:02:49.000
+<v Theo>That's a useful filter. I've been collecting pains without asking what's underneath them.
+
+00:02:49.400 --> 00:02:56.000
+<v Mac>Exactly Theo. And the discovery skill is asking the follow-up question: "why does that matter to you? What happens if this problem isn't solved?" That's where the job-to-be-done lives.
+
+00:02:56.300 --> 00:03:03.000
+<v Raj>Can I bring up something related to customer conversations? I had a call last week where the customer told me they were evaluating a competitor — GitHub's native deployment environments. And I didn't have a good answer for why Release was better.
+
+00:03:03.400 --> 00:03:14.000
+<v Mac>What did you say?
+
+00:03:14.300 --> 00:03:22.000
+<v Raj>I said our approval gates were more configurable. But I wasn't confident in that. I don't know GitHub's deployment environments well enough to make the comparison credibly.
+
+00:03:22.400 --> 00:03:32.000
+<v Mac>Okay. So two things here. One — you should never pretend confidence you don't have in a customer call. "That's a great question, let me follow up with a proper comparison" is a legitimate answer. Two — and this is on me — we as a team need to be better at competitive intelligence. Do you all have a clear picture of the competitive landscape for your product areas?
+
+00:03:32.300 --> 00:03:36.000
+<v Fatima>For Sign I have a decent picture of Sigstore and Azure Trusted Signing. Less clear on the GitHub native stuff.
+
+00:03:36.400 --> 00:03:41.000
+<v Chloe>Same for Release. GitHub and GitLab have both been building into this space and I don't have a systematic view.
+
+00:03:41.400 --> 00:03:50.000
+<v Mac>I'm going to make a request. By our next meeting, I want each team to bring a one-paragraph competitive summary for your top two competitors. Not a full analysis — just enough that your PMs can hold a credible conversation in a customer call. Can we do that?
+
+00:03:50.300 --> 00:03:53.000
+<v Jordan>One paragraph I can do.
+
+00:03:53.400 --> 00:03:57.000
+<v Lena>Same. We have more competitive data than we're using. I'll synthesize it.
+
+00:03:57.300 --> 00:04:02.000
+<v Mac>Good. Priya — for Sign the Sigstore story is interesting because it's open source and we integrate with it. How do you position us versus it?
+
+00:04:02.400 --> 00:04:13.000
+<v Priya>Sigstore is the open standard. We're the enterprise layer on top. We bring policy enforcement, audit trails, HSM integration, and support. Sigstore doesn't have a support contract or an SLA. For enterprises that's meaningful.
+
+00:04:13.300 --> 00:04:18.000
+<v Mac>That's a crisp two-sentence positioning. Write that down and make sure Jordan and Fatima have it. That's how I want everyone to be able to talk about their space.
+
+00:04:18.300 --> 00:04:23.000
+<v Jordan>I actually want to ask about something adjacent to this. When I'm in a customer conversation and they bring up a competitor, should I be asking them about it? Like, probing their perception?
+
+00:04:23.400 --> 00:04:34.000
+<v Mac>Yes — absolutely. Customer perception of competitors is gold. Ask them: "What are you hearing about them? What made you consider them?" Not to argue, but to understand their mental model. You'll learn more about how customers see the market than any analyst report.
+
+00:04:34.300 --> 00:04:39.000
+<v Jordan>I've been avoiding those questions because I didn't want to bring attention to competitors.
+
+00:04:39.400 --> 00:04:47.000
+<v Mac>Common instinct but it backfires. Customers have already done the research. Your job is to understand their mental model so you can meet them where they are. Don't pretend the alternatives don't exist.
+
+00:04:47.300 --> 00:04:52.000
+<v Jordan>That's a different mindset. I'll try it in my next call.
+
+00:04:52.400 --> 00:05:00.000
+<v Mac>Good. Let me transition to the cross-team coordination piece. Last week we talked about the Infra changes visibility problem Chloe raised. Did you and Lena make progress on the proposal?
+
+00:05:00.300 --> 00:05:09.000
+<v Chloe>Yes. Lena and I talked on Friday. We drafted a simple proposal: Kenji's team posts a planned changes digest in a shared Slack channel every Monday. Product teams have until Wednesday to flag concerns. If no flags, changes proceed Thursday.
+
+00:05:09.300 --> 00:05:14.000
+<v Mac>That's a clean process. Did you talk to Kenji about it?
+
+00:05:14.400 --> 00:05:20.000
+<v Lena>I did. He's supportive. He said his team already does an internal review meeting Monday mornings. Adding a summary post is maybe thirty minutes of effort.
+
+00:05:20.300 --> 00:05:25.000
+<v Mac>I love when a coordination problem has a thirty-minute solution. Let's run it for four weeks and see if it changes anything.
+
+00:05:25.400 --> 00:05:30.000
+<v Chloe>Already set up the channel. First digest goes out Monday.
+
+00:05:30.300 --> 00:05:37.000
+<v Mac>Nice. I want to also check in on the Sign-Scan SBOM situation from last week. Amara, Priya — have you connected?
+
+00:05:37.400 --> 00:05:46.000
+<v Amara>We had a thirty minute call on Thursday. The conclusion is: SBOM signing should be an optional capability in the Scan workflow that calls Sign's API. We don't need to build a separate integration — Sign's existing signing API can handle it.
+
+00:05:46.300 --> 00:05:51.000
+<v Priya>We need to add SBOM artifacts to our supported artifact types. That's a small lift on the Sign side. Maybe one sprint.
+
+00:05:51.400 --> 00:05:57.000
+<v Mac>Good outcome. How long did it take from the problem being raised to you two having a solution?
+
+00:05:57.300 --> 00:06:01.000
+<v Amara>About a week.
+
+00:06:01.400 --> 00:06:09.000
+<v Mac>If the monthly PM sync Priya and Lena are going to have had been running since October, this probably surfaces in November and ships in December. The structural coordination fix matters. Keep each other close.
+
+00:06:09.300 --> 00:06:13.000
+<v Priya>Agreed. The thirty minute monthly call pays for itself a hundred times over.
+
+00:06:13.400 --> 00:06:21.000
+<v Mac>Okay. I want to do something a little different today. I want to spend the last twenty minutes on what I'm calling a "working session" — not a presentation, a discussion. Topic is: how do we define good PM work in this org?
+
+00:06:21.300 --> 00:06:26.000
+<v Ben>Is this connected to the leveling rubric conversation from last week?
+
+00:06:26.400 --> 00:06:34.000
+<v Mac>Yes, indirectly. But I'm less interested in the rubric and more interested in what you all actually believe makes a PM good. Because I find that when I ask that question, people say smart things that they then don't practice. So let's start there. What makes a PM good? Someone go first.
+
+00:06:34.300 --> 00:06:39.000
+<v Omar>I'll go. A good PM knows the customer better than anyone else in the room. Not just their pain — their workflow, their constraints, their goals.
+
+00:06:39.400 --> 00:06:44.000
+<v Mac>Good. What else?
+
+00:06:44.300 --> 00:06:49.000
+<v Fatima>A good PM knows when to say no. There's always more to build than capacity to build it. The judgment to prioritize ruthlessly is what separates average PMs from great ones.
+
+00:06:49.400 --> 00:06:55.000
+<v Mac>I love that. The courage of the no is real. What else?
+
+00:06:55.300 --> 00:07:00.000
+<v Theo>A good PM makes the engineering team feel like they're solving an interesting problem, not executing a feature list.
+
+00:07:00.400 --> 00:07:07.000
+<v Mac>That's a great one Theo. The PM as motivator, not just coordinator. What else?
+
+00:07:07.300 --> 00:07:12.000
+<v Yuki>A good PM gives clear, unambiguous specs. I've seen products fail because the spec was vague and everyone built something slightly different from what was intended.
+
+00:07:12.400 --> 00:07:18.000
+<v Mac>Yuki, I want to push on that. Clear specs are necessary but not sufficient. I've seen PMs who write crystal clear specs for the wrong things. What's the step before the clear spec?
+
+00:07:18.300 --> 00:07:24.000
+<v Yuki>Understanding the problem deeply enough that you're speccing the right thing.
+
+00:07:24.400 --> 00:07:30.000
+<v Mac>Exactly. Discovery before definition. The spec is downstream of the insight. What's one more?
+
+00:07:30.300 --> 00:07:36.000
+<v Diana>A good PM creates alignment without authority. We can't mandate anything. We influence engineers, designers, executives — all without direct power. That's the hardest part of the job.
+
+00:07:36.400 --> 00:07:46.000
+<v Mac>Diana, I think that's actually the core of the job. Influence without authority is the PM superpower. And the way you build it is trust — consistent, demonstrated, over time. You know what erodes PM trust faster than anything else? Changing priorities without explaining why.
+
+00:07:46.300 --> 00:07:51.000
+<v Raj>I've been guilty of that. I changed the sprint priorities two weeks ago and I just updated the Jira board without explaining the reasoning.
+
+00:07:51.400 --> 00:07:58.000
+<v Mac>What happened?
+
+00:07:58.300 --> 00:08:05.000
+<v Raj>An engineer on the Release team asked me why the item he'd been prepping for was suddenly deprioritized. And I realized I didn't have a good answer ready. I had to backtrack.
+
+00:08:05.400 --> 00:08:14.000
+<v Mac>What would you do differently?
+
+00:08:14.300 --> 00:08:21.000
+<v Raj>Tell the team before I update the board. Maybe five minutes in standup explaining the context. "We're shifting this because of X customer signal." People need the why.
+
+00:08:21.400 --> 00:08:29.000
+<v Mac>That's it. The why is the entire game. Engineers who understand why you're prioritizing something will build it differently than engineers executing a task. Context changes quality. Everyone take that with you.
+
+00:08:29.300 --> 00:08:35.000
+<v Mac>Alright, I want to close with a few individual shoutouts before we do team updates. I make it a point to do these publicly because I think people don't hear positive feedback enough.
+
+00:08:35.400 --> 00:08:41.000
+<v Mac>Omar — the safe rollback launch this week was clean. No incidents, customer who had the Q3 issue is already using it. That's a team that executed under pressure and delivered. Well done.
+
+00:08:41.300 --> 00:08:44.000
+<v Omar>The team did the work. I'll pass it along.
+
+00:08:44.400 --> 00:08:51.000
+<v Mac>Chloe — your instinct to raise the Infra changes problem last week, and then immediately go solve it with Lena rather than waiting for someone else to fix it, is exactly the PM behavior I'm trying to cultivate. That was a great example of owning a problem end to end.
+
+00:08:51.300 --> 00:08:54.000
+<v Chloe>Thank you. It's frustrating when things fall through the cracks. Felt good to do something about it.
+
+00:08:54.400 --> 00:09:01.000
+<v Mac>And Amara — naming the SBOM customer commitment gap in our team meeting instead of hoping it would work itself out took some courage. That's the kind of transparency that makes us better.
+
+00:09:01.300 --> 00:09:04.000
+<v Amara>Appreciate it. I debated whether to bring it up.
+
+00:09:04.400 --> 00:09:10.000
+<v Mac>Always bring it up. Okay — quick team updates. Two minutes per team. Omar, you went first last week. Diana, you go first today. Let's rotate.
+
+00:09:10.300 --> 00:09:20.000
+<v Diana>Licensing — license transfer self-service is in active design this week. Yuki has the first wireframes drafted and we're getting review from two customers tomorrow. Ben is leading the contract management discovery sprint — he's done three customer interviews so far.
+
+00:09:20.300 --> 00:09:24.000
+<v Mac>Good. How are the customer interviews going Ben?
+
+00:09:24.400 --> 00:09:33.000
+<v Ben>Really well. The job-to-be-done framing you mentioned earlier — I started using it in my third interview and it completely changed the conversation. Customer started telling me about their renewal anxiety rather than just complaining about the UI.
+
+00:09:33.300 --> 00:09:37.000
+<v Mac>That's exactly it. Renewal anxiety is the job-to-be-done. The UI complaint was just the surface.
+
+00:09:37.400 --> 00:09:47.000
+<v Ben>Yes. And now I have a clearer picture of what the contract management feature actually needs to solve — it's not about showing contract terms, it's about removing the uncertainty around "when do I need to act on my renewal, and what do I do?"
+
+00:09:47.300 --> 00:09:51.000
+<v Mac>Write that up. That insight should be in the feature brief.
+
+00:09:51.400 --> 00:09:58.000
+<v Omar>Release — multi-region design doc is done. Raza is reviewing it. I'm optimistic. ServiceNow integration kick-off is scheduled for next week. Pipeline graph caching work started.
+
+00:09:58.300 --> 00:10:04.000
+<v Chloe>I want to add — the environment dependency feature I've been working on had a really good customer validation session yesterday. The compliance framing Mac talked about last week is landing really well with customers.
+
+00:10:04.300 --> 00:10:08.000
+<v Mac>Nice. Keep pulling on that thread. Lena?
+
+00:10:08.400 --> 00:10:18.000
+<v Lena>Scan — DB client refactor is underway. One week in. Tariq says the thread-safety issues are worse than expected — there are a few edge cases that weren't in the original scoping. He's still confident on the overall timeline but it's tight.
+
+00:10:18.300 --> 00:10:22.000
+<v Mac>Flag me if the timeline shifts. I don't want that slipping silently.
+
+00:10:22.400 --> 00:10:26.000
+<v Lena>Will do. Theo's govulncheck spike doc is drafted. I'm reviewing it today.
+
+00:10:26.300 --> 00:10:34.000
+<v Priya>Sign — key rotation is in great shape. We got a really positive response from the beta customer in financial services. They specifically praised the audit trail, which is something we almost cut for the beta.
+
+00:10:34.300 --> 00:10:38.000
+<v Mac>Good call not cutting it. What's the Sign team working on this sprint beyond key rotation?
+
+00:10:38.400 --> 00:10:46.000
+<v Priya>Jordan is on the webhook delivery work and Fatima is doing the cert expiry in-app warning. Both are on track.
+
+00:10:46.300 --> 00:10:53.000
+<v Mac>Good. Fatima, on the cert expiry warning — is there an opportunity to tie that to the platform narrative? Something like: this is the product protecting you before a problem happens, not just alerting you after.
+
+00:10:53.400 --> 00:10:59.000
+<v Fatima>Oh that's interesting. A proactive protection frame rather than a notification frame.
+
+00:10:59.400 --> 00:11:04.000
+<v Mac>Think about the copy in the UI too. "Your cert expires in 30 days" is boring. "A signing failure is 30 days away — renew now" tells a story.
+
+00:11:04.300 --> 00:11:08.000
+<v Fatima>I love that framing. I'll bring it to design.
+
+00:11:08.400 --> 00:11:15.000
+<v Mac>Alright. Great session. I want everyone working on those competitive summaries for next week. And leads — the strategic narrative first pass is due the week after. Don't let that sneak up on you. See you next Wednesday.
+
+00:11:15.300 --> 00:11:18.000
+<v Lena>Thanks Mac. Good one today.
+
+00:11:18.300 --> 00:11:22.000
+<v Diana>See everyone next week.

@@ -20,6 +20,9 @@ backend/uploads/
 # ChromaDB data
 backend/chroma_data/
 
+# Build artifacts
+backend/static/
+
 # Node
 node_modules/
 

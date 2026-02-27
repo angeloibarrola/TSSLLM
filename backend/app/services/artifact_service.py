@@ -3,16 +3,16 @@ from app.models.artifact import Artifact
 
 class ArtifactService:
     @staticmethod
-    def get_all(db: Session) -> list[Artifact]:
-        return db.query(Artifact).order_by(Artifact.updated_at.desc()).all()
+    def get_all(db: Session, workspace_id: str) -> list[Artifact]:
+        return db.query(Artifact).filter(Artifact.workspace_id == workspace_id).order_by(Artifact.updated_at.desc()).all()
 
     @staticmethod
     def get_by_id(db: Session, artifact_id: int) -> Artifact | None:
         return db.query(Artifact).filter(Artifact.id == artifact_id).first()
 
     @staticmethod
-    def create(db: Session, title: str, content_markdown: str = "") -> Artifact:
-        artifact = Artifact(title=title, content_markdown=content_markdown)
+    def create(db: Session, title: str, workspace_id: str, content_markdown: str = "") -> Artifact:
+        artifact = Artifact(title=title, content_markdown=content_markdown, workspace_id=workspace_id)
         db.add(artifact)
         db.commit()
         db.refresh(artifact)
