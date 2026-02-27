@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./tssllm.db"  # overridden by DATABASE_URL env var in Azure
     chroma_persist_dir: str = "./chroma_data"
     upload_dir: str = "./uploads"
+    seed_data_dir: str = ""  # overridden by SEED_DATA_DIR env var in Azure
     azure_client_id: str = "d3590ed6-52b3-4102-aeff-aad2292ab01c"  # Microsoft Office (first-party)
     azure_tenant_id: str = "72f988bf-86f1-41af-91ab-2d7cd011db47"  # Microsoft corp tenant
 

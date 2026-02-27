@@ -12,7 +12,23 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 DEMO_TEAM_ID = "00000000-0000-0000-0000-000000000000"
-SEED_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "seed_data")
+
+def _resolve_seed_data_dir() -> str:
+    """Resolve seed_data directory with fallbacks for Azure runtime."""
+    # 1. Explicit env var / config setting (set in Azure App Settings)
+    if settings.seed_data_dir:
+        return settings.seed_data_dir
+    # 2. Relative to __file__ (works for local dev)
+    file_based = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "seed_data")
+    if os.path.isdir(file_based):
+        return file_based
+    # 3. Fallback: Azure default deployment path
+    azure_fallback = "/home/site/wwwroot/seed_data"
+    if os.path.isdir(azure_fallback):
+        return azure_fallback
+    return file_based  # return original for logging even if missing
+
+SEED_DATA_DIR = _resolve_seed_data_dir()
 
 NOTEBOOKS = [
     {
@@ -36,6 +52,10 @@ def seed_demo_workspace(db: Session) -> None:
         return  # already seeded
 
     logger.info(f"Seeding demo workspace. SEED_DATA_DIR={SEED_DATA_DIR} exists={os.path.isdir(SEED_DATA_DIR)}")
+    if os.path.isdir(SEED_DATA_DIR):
+        logger.info(f"Seed data contents: {os.listdir(SEED_DATA_DIR)}")
+    else:
+        logger.warning(f"Seed data dir missing! __file__={os.path.abspath(__file__)}, cwd={os.getcwd()}")
 
     team = Team(id=DEMO_TEAM_ID, name="Demo Workspace", join_code="DEMO-0000")
     db.add(team)

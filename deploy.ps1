@@ -72,7 +72,7 @@ Write-Host "Step 7: Configuring persistent storage paths..." -ForegroundColor Ye
 az webapp config appsettings set `
     --name $appName `
     --resource-group $rgName `
-    --settings DATABASE_URL="sqlite:////home/tssllm.db" CHROMA_PERSIST_DIR="/home/chroma_data" UPLOAD_DIR="/home/uploads"
+    --settings DATABASE_URL="sqlite:////home/tssllm.db" CHROMA_PERSIST_DIR="/home/chroma_data" UPLOAD_DIR="/home/uploads" SEED_DATA_DIR="/home/site/wwwroot/seed_data"
 
 # Step 9: Migrate DB schema (add name column if missing)
 Write-Host "Step 8: Running database migration..." -ForegroundColor Yellow
