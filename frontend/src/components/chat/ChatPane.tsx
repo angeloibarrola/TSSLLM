@@ -17,7 +17,17 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const pendingTeachRef = useRef<string | null>(null);
 
   useEffect(() => {
-    api.getMessages().then(setMessages).catch(() => {});
+    api.getMessages().then((msgs) => {
+      setMessages(msgs);
+      // Restore follow-up suggestions for existing conversations
+      if (msgs.length > 0 && msgs[msgs.length - 1].role === "assistant") {
+        setLoadingFollowups(true);
+        api.getFollowups()
+          .then(setFollowups)
+          .catch(() => setFollowups([]))
+          .finally(() => setLoadingFollowups(false));
+      }
+    }).catch(() => {});
   }, [refreshKey]);
 
   // Fetch suggestions when chat is empty and sources exist
