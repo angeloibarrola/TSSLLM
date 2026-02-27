@@ -59,7 +59,7 @@ export function WorkspaceHome({ team, onOpenNotebook, onLeave, onTeamUpdated }: 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 bg-gray-900 border-b border-gray-800">
         <div className="flex items-center gap-3">
-          <h1 className="text-lg font-bold">📚 TSS LLM</h1>
+          <h1 className="text-lg font-bold">AI Knowledge Notebook</h1>
         </div>
         <button
           onClick={onLeave}

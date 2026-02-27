@@ -45,10 +45,10 @@ export function LandingPage({ onTeamReady, savedTeams, onRemoveTeam }: LandingPa
 
   return (
     <div className="h-screen flex items-center justify-center bg-gray-950 text-gray-100">
-      <div className="max-w-md w-full mx-4">
+      <div className="max-w-lg w-full mx-4">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-2">📚 TSS LLM</h1>
-          <p className="text-gray-400 text-lg">Trust and Security Services</p>
+          <h1 className="text-5xl font-bold mb-2 whitespace-nowrap">AI Knowledge Notebook</h1>
+          <p className="text-gray-400 text-lg">Your digital coworker, guided by the sources you trust.</p>
         </div>
 
         <div className="space-y-3">
