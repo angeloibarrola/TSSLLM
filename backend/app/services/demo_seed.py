@@ -29,6 +29,9 @@ def _resolve_seed_data_dir() -> str:
     return file_based  # return original for logging even if missing
 
 SEED_DATA_DIR = _resolve_seed_data_dir()
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+SUPPORTED_EXTENSIONS = (".vtt", ".pdf", ".docx")
 
 NOTEBOOKS = [
     {
@@ -38,6 +41,10 @@ NOTEBOOKS = [
     {
         "name": "WBR",
         "folder": os.path.join(SEED_DATA_DIR, "fake_transcripts"),
+    },
+    {
+        "name": "Web Trust Docs",
+        "folder": os.path.join(REPO_ROOT, "web_trust_data"),
     },
     {
         "name": "Artifact Signing Customer Sentiment Analysis",
@@ -76,10 +83,10 @@ def seed_demo_workspace(db: Session) -> None:
             logger.warning(f"Seed: skipping '{nb_def['name']}' — folder not found: {folder}")
             continue
 
-        vtt_files = sorted(f for f in os.listdir(folder) if f.lower().endswith(".vtt"))
-        logger.info(f"Seed: importing {len(vtt_files)} VTT files into '{nb_def['name']}'")
+        source_files = sorted(f for f in os.listdir(folder) if f.lower().endswith(SUPPORTED_EXTENSIONS))
+        logger.info(f"Seed: importing {len(source_files)} files into '{nb_def['name']}'")
 
-        for filename in vtt_files:
+        for filename in source_files:
             src_path = os.path.join(folder, filename)
             file_id = uuid.uuid4().hex[:8]
             dest_path = os.path.join(settings.upload_dir, f"{file_id}_{filename}")
