@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Save, FileText, Eye, Pencil, Loader2, Mail } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { api } from "../../api/client";
+import { stripMarkdown } from "../../utils/stripMarkdown";
+import type { Api } from "../../api/client";
 import type { Artifact, Source } from "../../types";
 
-export function StudioPane({ selectedSourceId, onClearSource, pendingArtifactId, onClearPending }: { selectedSourceId: number | null; onClearSource: () => void; pendingArtifactId?: number | null; onClearPending?: () => void }) {
+export function StudioPane({ api, refreshKey, selectedSourceId, onClearSource, pendingArtifactId, onClearPending }: { api: Api; refreshKey: number; selectedSourceId: number | null; onClearSource: () => void; pendingArtifactId?: number | null; onClearPending?: () => void }) {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [selected, setSelected] = useState<Artifact | null>(null);
   const [editing, setEditing] = useState(false);
@@ -24,7 +25,7 @@ export function StudioPane({ selectedSourceId, onClearSource, pendingArtifactId,
     }
   };
 
-  useEffect(() => { fetchArtifacts(); }, []);
+  useEffect(() => { fetchArtifacts(); }, [refreshKey]);
 
   // Auto-select a newly created artifact from chat
   useEffect(() => {
@@ -187,7 +188,7 @@ export function StudioPane({ selectedSourceId, onClearSource, pendingArtifactId,
             <button
               onClick={() => {
                 const subject = encodeURIComponent(title || "Note");
-                const body = encodeURIComponent(content);
+                const body = encodeURIComponent(stripMarkdown(content));
                 window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
               }}
               className="p-1 text-gray-400 hover:text-gray-200"
