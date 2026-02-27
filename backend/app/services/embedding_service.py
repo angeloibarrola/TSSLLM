@@ -37,10 +37,14 @@ class EmbeddingService:
             json.dump(cls._store or [], f)
 
     @classmethod
-    def _embed(cls, texts: list[str]) -> list[list[float]]:
+    def _embed(cls, texts: list[str], batch_size: int = 100) -> list[list[float]]:
         client = cls._get_client()
-        response = client.embeddings.create(model=settings.embedding_model, input=texts)
-        return [item.embedding for item in response.data]
+        all_embeddings: list[list[float]] = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            response = client.embeddings.create(model=settings.embedding_model, input=batch)
+            all_embeddings.extend(item.embedding for item in response.data)
+        return all_embeddings
 
     @staticmethod
     def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
