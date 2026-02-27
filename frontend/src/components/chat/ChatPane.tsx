@@ -272,7 +272,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your sources..."
+            placeholder="Ask about your sources or type /help for commands"
             className="flex-1 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm placeholder-gray-500 focus:outline-none focus:border-blue-500"
           />
           <button
