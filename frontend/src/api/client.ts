@@ -83,6 +83,8 @@ export function createApi(workspaceId: string) {
       request<{ ok: boolean }>(`${p}/chat/reset`, { method: "DELETE" }),
     getSuggestions: () =>
       request<{ suggestions: string[] }>(`${p}/chat/suggestions`).then((r) => r.suggestions),
+    getFollowups: () =>
+      request<{ suggestions: string[] }>(`${p}/chat/followups`, { method: "POST" }).then((r) => r.suggestions),
 
     // Artifacts
     getArtifacts: () => request<import("../types").Artifact[]>(`${p}/artifacts`),
@@ -101,13 +103,39 @@ export function createApi(workspaceId: string) {
   };
 }
 
-// Workspaces
-export const workspaceApi = {
-  list: () => request<import("../types").Workspace[]>("/api/workspaces"),
+// Teams (workspaces)
+export const teamApi = {
   create: (name?: string) =>
+    request<import("../types").Team>("/api/teams", {
+      method: "POST",
+      body: JSON.stringify({ name: name ?? "My Workspace" }),
+    }),
+  get: (id: string) =>
+    request<import("../types").Team>(`/api/teams/${id}`),
+  join: (code: string) =>
+    request<import("../types").Team>("/api/teams/join", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    }),
+  demo: () =>
+    request<import("../types").Team>("/api/teams/demo"),
+  rename: (id: string, name: string) =>
+    request<import("../types").Team>(`/api/teams/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
+    }),
+};
+
+// Workspaces (notebooks)
+export const workspaceApi = {
+  list: (teamId?: string) =>
+    request<import("../types").Workspace[]>(
+      teamId ? `/api/workspaces?team_id=${teamId}` : "/api/workspaces"
+    ),
+  create: (name?: string, teamId?: string) =>
     request<{ id: string; name: string }>("/api/workspaces", {
       method: "POST",
-      body: JSON.stringify({ name: name ?? "Untitled Notebook" }),
+      body: JSON.stringify({ name: name ?? "Untitled Notebook", team_id: teamId }),
     }),
   get: (id: string) =>
     request<import("../types").Workspace>(`/api/workspaces/${id}`),

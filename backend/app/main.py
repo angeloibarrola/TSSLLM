@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.database import engine, Base
 from app.routers import workspaces, sources, chat, artifacts
+from app.routers import teams as teams_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,6 +18,18 @@ async def lifespan(app: FastAPI):
         if "chat_reset_at" not in columns:
             conn.execute(text("ALTER TABLE workspaces ADD COLUMN chat_reset_at TIMESTAMP NULL"))
             conn.commit()
+        if "team_id" not in columns:
+            conn.execute(text("ALTER TABLE workspaces ADD COLUMN team_id VARCHAR(36) NULL REFERENCES teams(id)"))
+            conn.commit()
+    # Seed demo workspace
+    from app.database import SessionLocal
+    from app.services.demo_seed import seed_demo_workspace
+    try:
+        db = SessionLocal()
+        seed_demo_workspace(db)
+        db.close()
+    except Exception as e:
+        print(f"Warning: demo seed failed: {e}")
     yield
 
 app = FastAPI(title="TSS LLM - Trust and Security Services", lifespan=lifespan)
@@ -29,6 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(teams_router.router, prefix="/api/teams", tags=["teams"])
 app.include_router(workspaces.router, prefix="/api/workspaces", tags=["workspaces"])
 app.include_router(sources.router, prefix="/api/workspaces/{workspace_id}/sources", tags=["sources"])
 app.include_router(chat.router, prefix="/api/workspaces/{workspace_id}/chat", tags=["chat"])

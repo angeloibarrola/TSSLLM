@@ -1,17 +1,46 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { Panel, Group as PanelGroup, usePanelRef, type PanelImperativeHandle, type PanelSize } from "react-resizable-panels";
-import { BookOpen, MessageSquare, FileText } from "lucide-react";
+import { BookOpen, MessageSquare, FileText, Share2, Check, ArrowLeft } from "lucide-react";
 import { SourcesPane } from "./sources/SourcesPane";
 import { ChatPane } from "./chat/ChatPane";
 import { StudioPane } from "./studio/StudioPane";
 import { ResizeHandle } from "./ResizeHandle";
-import { api } from "../api/client";
+import NotebookSwitcher from "./NotebookSwitcher";
+import { createApi } from "../api/client";
+import { useWorkspaceSync } from "../hooks/useWorkspaceSync";
+import type { Workspace } from "../types";
 
-export function Layout() {
+interface LayoutProps {
+  workspaceId: string;
+  workspaces: Workspace[];
+  onSwitchNotebook: (id: string) => void;
+  onCreateNotebook: () => void;
+  onRenameNotebook: (name: string) => void;
+  onDeleteNotebook: () => void;
+  onBackToHome?: () => void;
+  teamName?: string;
+  joinCode?: string;
+}
+
+export function Layout({ workspaceId, workspaces, onSwitchNotebook, onCreateNotebook, onRenameNotebook, onDeleteNotebook, onBackToHome, teamName }: LayoutProps) {
+  const api = useMemo(() => createApi(workspaceId), [workspaceId]);
+
   const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
   const [enabledSourceIds, setEnabledSourceIds] = useState<Set<number>>(new Set());
   const [pendingArtifactId, setPendingArtifactId] = useState<number | null>(null);
   const allKnownIds = useRef<Set<number>>(new Set());
+  const [copied, setCopied] = useState(false);
+
+  // Sync refresh counters — increment to trigger refetch in child panes
+  const [sourcesRefresh, setSourcesRefresh] = useState(0);
+  const [chatRefresh, setChatRefresh] = useState(0);
+  const [artifactsRefresh, setArtifactsRefresh] = useState(0);
+
+  useWorkspaceSync(workspaceId, {
+    onSourcesChanged: () => setSourcesRefresh((n) => n + 1),
+    onChatMessage: () => setChatRefresh((n) => n + 1),
+    onArtifactsChanged: () => setArtifactsRefresh((n) => n + 1),
+  });
 
   // Panel refs for programmatic collapse/expand
   const sourcesPanelRef = usePanelRef();
@@ -80,13 +109,46 @@ export function Layout() {
     });
   };
 
+  const handleShare = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gray-950 text-gray-100">
       <header className="flex items-center justify-between px-6 py-3 bg-gray-900 border-b border-gray-800">
-        <h1 className="text-lg font-bold tracking-tight">
-          📚 TSSLLM <span className="text-gray-400 font-normal text-sm ml-2">Team Source Studio</span>
-        </h1>
+        <div className="flex items-center gap-3">
+          {onBackToHome && (
+            <button
+              onClick={onBackToHome}
+              className="p-1.5 text-gray-400 hover:text-white rounded transition-colors"
+              title="Back to workspace"
+            >
+              <ArrowLeft size={18} />
+            </button>
+          )}
+          <h1 className="text-lg font-bold tracking-tight">
+            📚 TSS LLM {teamName && <span className="text-gray-400 font-normal text-sm ml-1">{teamName}</span>}
+          </h1>
+          <NotebookSwitcher
+            workspaces={workspaces}
+            currentWorkspaceId={workspaceId}
+            onSwitch={onSwitchNotebook}
+            onCreateNotebook={onCreateNotebook}
+            onRenameNotebook={onRenameNotebook}
+            onDeleteNotebook={onDeleteNotebook}
+          />
+        </div>
         <div className="flex items-center gap-1">
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition-colors bg-green-600 hover:bg-green-700 text-white mr-2"
+            title="Copy workspace link"
+          >
+            {copied ? <Check size={14} /> : <Share2 size={14} />}
+            {copied ? "Copied!" : "Share"}
+          </button>
           <button
             onClick={() => togglePanel(sourcesPanelRef, sourcesCollapsed)}
             className={`p-1.5 rounded transition-colors ${sourcesCollapsed ? "text-gray-500 hover:text-gray-300" : "text-blue-400 hover:text-blue-300 bg-gray-800"}`}
@@ -122,6 +184,8 @@ export function Layout() {
           className="flex flex-col"
         >
           <SourcesPane
+            api={api}
+            refreshKey={sourcesRefresh}
             onSelectSource={(id) => setSelectedSourceId(id)}
             selectedSourceId={selectedSourceId}
             enabledSourceIds={enabledSourceIds}
@@ -141,7 +205,7 @@ export function Layout() {
           onResize={makeResizeHandler(setChatCollapsed)}
           className="flex flex-col min-w-0"
         >
-          <ChatPane enabledSourceIds={enabledSourceIds} onSaveToNote={handleSaveToNote} />
+          <ChatPane api={api} refreshKey={chatRefresh} enabledSourceIds={enabledSourceIds} onSaveToNote={handleSaveToNote} />
         </Panel>
         <ResizeHandle id="chat-studio" />
         <Panel
@@ -154,7 +218,7 @@ export function Layout() {
           onResize={makeResizeHandler(setStudioCollapsed)}
           className="flex flex-col"
         >
-          <StudioPane selectedSourceId={selectedSourceId} onClearSource={() => setSelectedSourceId(null)} pendingArtifactId={pendingArtifactId} onClearPending={() => setPendingArtifactId(null)} />
+          <StudioPane api={api} refreshKey={artifactsRefresh} selectedSourceId={selectedSourceId} onClearSource={() => setSelectedSourceId(null)} pendingArtifactId={pendingArtifactId} onClearPending={() => setPendingArtifactId(null)} />
         </Panel>
       </PanelGroup>
     </div>
