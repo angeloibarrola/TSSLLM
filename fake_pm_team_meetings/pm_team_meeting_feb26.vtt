@@ -1,0 +1,324 @@
+WEBVTT
+
+NOTE
+PM Team Meeting — Week 4
+Date: Wednesday, February 26, 2025
+Attendees: Mac (PM Manager), Priya (Sign Lead), Jordan (Sign), Fatima (Sign), Lena (Scan Lead), Theo (Scan), Amara (Scan), Omar (Release Lead), Chloe (Release), Raj (Release), Diana (Licensing Lead), Yuki (Licensing), Ben (Licensing)
+
+00:00:00.000 --> 00:00:08.000
+<v Mac>Good morning everyone. Last Wednesday of February. We've had a strong month and I want to acknowledge that before we get into anything else. The strategic narratives are sharp, the cross-team coordination is visibly improving, and a lot of good product work shipped. I'm proud of this group.
+
+00:00:08.300 --> 00:00:12.000
+<v Ben>It has felt like a different energy than January. Less reactive.
+
+00:00:12.400 --> 00:00:17.000
+<v Mac>That's intentional. January was about closing Q4. February was about orienting toward where we're going. I want us to stay in that mode.
+
+00:00:17.300 --> 00:00:22.000
+<v Mac>Okay — leadership update first, then strategic narrative dry run, then team updates. Leadership update: the exec presentation is tomorrow morning. Stuart confirmed the time — nine AM. All four area leads should have their final decks reviewed by me by end of day today. I'll send written feedback by eight tonight at the latest.
+
+00:00:22.300 --> 00:00:26.000
+<v Priya>Sign's deck is done. Sending to you after this meeting.
+
+00:00:26.400 --> 00:00:29.000
+<v Diana>Same with Licensing.
+
+00:00:29.300 --> 00:00:33.000
+<v Lena>Scan is ninety percent. I need to add the "now vs. next" timeline slide we discussed. One hour of work.
+
+00:00:33.400 --> 00:00:37.000
+<v Mac>Do that first before anything else today Lena.
+
+00:00:37.300 --> 00:00:41.000
+<v Omar>Release is ready. I incorporated the risks slide and the "deployments you can defend" framing.
+
+00:00:41.400 --> 00:00:47.000
+<v Mac>Good. I'll have eyes on all four by noon and give you feedback with time to adjust. Now — there's also news from the executive team I want you to have before it hits the company all-hands next week.
+
+00:00:47.300 --> 00:00:51.000
+<v Amara>Is this the reorg rumor I've been hearing about?
+
+00:00:51.400 --> 00:01:02.000
+<v Mac>Let me give you the real picture. There's no reorg of the PM team. However — and this is real — the company is consolidating two engineering teams that were previously separate into a single platform engineering function. Infra and a portion of the DevOps tooling team are being merged under a single engineering director. This affects us because Kenji's team, which we work with constantly, will have a new org structure.
+
+00:01:02.300 --> 00:01:07.000
+<v Chloe>Does that affect the Infra changes digest we just set up? If the team is restructuring it might change who we talk to.
+
+00:01:07.400 --> 00:01:15.000
+<v Mac>Good instinct. I'd recommend holding the digest process stable until the new structure is clear — which Raza says will be communicated by end of March. Don't assume your existing Kenji relationships are going away, but be prepared for some reorganization of responsibilities.
+
+00:01:15.300 --> 00:01:20.000
+<v Lena>Kenji is staying in the platform engineering function though? He's not going anywhere?
+
+00:01:20.400 --> 00:01:26.000
+<v Mac>Kenji's role is secure. He may be reporting to a new director but his scope and ownership are staying. I confirmed that with Raza.
+
+00:01:26.300 --> 00:01:30.000
+<v Lena>Good. I'd be devastated to lose that relationship. He's one of the most responsive engineering leads we work with.
+
+00:01:30.400 --> 00:01:37.000
+<v Mac>That relationship is worth protecting regardless of org structure. Great engineering partnerships don't live on org charts — they live in habits and trust. Keep the habits.
+
+00:01:37.300 --> 00:01:43.000
+<v Mac>One more leadership item. Stuart shared something with me that I want to pass on as context. The company is in conversations with two potential enterprise customers — I can't share names — but both are in heavily regulated industries. Financial services and healthcare. If either of these closes, it would be our two largest enterprise accounts and it would significantly accelerate the compliance and audit trail work across all four product areas.
+
+00:01:43.300 --> 00:01:48.000
+<v Diana>The compliance report work Licensing and Release are building together would be directly relevant.
+
+00:01:48.400 --> 00:01:54.000
+<v Mac>Very directly relevant. Stuart made that connection explicitly. The cross-team compliance infrastructure you two are building is not a nice-to-have if these deals close. It could be table stakes.
+
+00:01:54.300 --> 00:01:59.000
+<v Omar>Should we be accelerating that work given these potential deals?
+
+00:01:59.400 --> 00:02:08.000
+<v Mac>I don't want to over-rotate on prospects — we've made that mistake before. But I do want to make sure that work is on track and not slipping. Diana, Omar — where are you on the joint compliance document service?
+
+00:02:08.400 --> 00:02:16.000
+<v Diana>We had the kickoff with Infra last week. Kenji assigned a senior engineer to it. The design doc is in review. We're targeting an initial build in sprint four.
+
+00:02:16.300 --> 00:02:20.000
+<v Omar>Release's SOC2 audit export is on the same timeline. They're designed to use the same underlying document signing service.
+
+00:02:20.400 --> 00:02:26.000
+<v Mac>Good. Keep me updated weekly on that one specifically. If it's at risk I want to know early, not late.
+
+00:02:26.300 --> 00:02:33.000
+<v Mac>Okay — strategic narrative dry run. I want to do a rapid-fire version since the actual presentation is tomorrow. Each lead — two minutes, just the core thesis and the success metrics. I'll give one piece of feedback. Let's go fast. Priya?
+
+00:02:33.400 --> 00:02:42.000
+<v Priya>Sign makes code signing invisible. Enterprise trust layer through HSM and key rotation. Artifact footprint expansion to containers, SBOMs, Helm. Success: eighty percent of releases signed end to end, zero manual key management steps, CSAT above four point five.
+
+00:02:42.300 --> 00:02:48.000
+<v Mac>Strong. One thing: open with a customer story. Before the thesis, thirty seconds on a real customer situation that illustrates why this matters. Bring the human in before the strategy.
+
+00:02:48.400 --> 00:02:51.000
+<v Priya>I have a good Meridian Financial story. I'll open with that.
+
+00:02:51.300 --> 00:02:55.000
+<v Mac>Perfect. Lena?
+
+00:02:55.400 --> 00:03:05.000
+<v Lena>Scan becomes an intelligent vulnerability advisor, not just a scanner. Speed bet: sub-twenty-second p95 by end of Q2 with dependency on DB refactor. Intelligence bet: false positive rate under three percent through reachability analysis, starting Go. Twelve-month vision: tell you which CVEs actually matter, not just which ones exist.
+
+00:03:05.300 --> 00:03:12.000
+<v Mac>Excellent. One note: the "twelve-month vision" distinction you just made verbally — make sure it's equally clear in the deck. Stuart will ask "when does this ship" and you want a clean answer.
+
+00:03:12.400 --> 00:03:16.000
+<v Lena>The now-vs-next slide handles it. I'll reference it explicitly when I get to the vision section.
+
+00:03:16.300 --> 00:03:19.000
+<v Mac>Good. Omar?
+
+00:03:19.400 --> 00:03:29.000
+<v Omar>Release becomes the platform for enterprise deployment governance. Three pillars: safe, compliant, and resilient deployments. Six-month metrics: approval gate adoption to sixty percent, multi-region in beta with five customers, ServiceNow shipped, zero P1 deployment failures.
+
+00:03:29.300 --> 00:03:36.000
+<v Mac>Strong. My one note: when you say "governance" in the exec presentation, immediately follow it with what that means for the customer — don't let it sit as jargon. Governance is a word executives love but customers experience it as "I need to prove to my auditors that we did this right." Make that translation explicit.
+
+00:03:36.400 --> 00:03:40.000
+<v Omar>I'll add a one-liner: "governance means deployments you can explain, audit, and defend."
+
+00:03:40.300 --> 00:03:43.000
+<v Mac>Write that down. That's your slide headline. Diana?
+
+00:03:43.400 --> 00:03:53.000
+<v Diana>Licensing is the enterprise control plane for the platform. Self-service administration eliminates support overhead. Compliance readiness for regulated industries. Usage intelligence that helps customers manage and predict their spend. The platform journey slide shows how customers arrive at Licensing as they expand.
+
+00:03:53.400 --> 00:03:59.000
+<v Mac>That platform journey slide is going to be the highlight of the presentation. Make sure it's polished. My one note: be ready for Stuart to ask how Licensing drives expansion revenue. Have a crisp answer.
+
+00:03:59.300 --> 00:04:07.000
+<v Diana>The answer is: customers with org hierarchy management expand to more product areas twice as fast as customers without it. I pulled that from cohort analysis last week.
+
+00:04:07.400 --> 00:04:12.000
+<v Mac>That number just became the most important slide in your deck. Put it front and center.
+
+00:04:12.300 --> 00:04:17.000
+<v Diana>Done. I'll add it to the opening. That's the kind of stat that changes the room.
+
+00:04:17.400 --> 00:04:23.000
+<v Mac>It does. Stuart will reference it in the next board meeting. Okay — dry run done. I feel good about tomorrow. You've all done strong work on these.
+
+00:04:23.300 --> 00:04:29.000
+<v Jordan>Mac, will you share how the exec presentation goes? Last time we did something like this we heard nothing for two weeks and had to guess.
+
+00:04:29.400 --> 00:04:37.000
+<v Mac>Yes. I'll send a debrief summary by end of day tomorrow. The four leads will hear from me first with any specific feedback on their narratives. Then a team-wide summary. You'll know within twenty-four hours.
+
+00:04:37.300 --> 00:04:41.000
+<v Jordan>That's all I needed to hear. Thank you.
+
+00:04:41.400 --> 00:04:49.000
+<v Mac>Okay. I want to use the second half of our time today for something that's been on my mind for a few weeks. I want to talk about career trajectory more explicitly. Not individual conversations — we do those in one-on-ones. But some principles I want to share with the whole team.
+
+00:04:49.300 --> 00:04:54.000
+<v Raj>Are we getting the mid-year review framing?
+
+00:04:54.400 --> 00:05:04.000
+<v Mac>Partly. But I also want to go deeper than review cycles. Mid-year reviews are a snapshot. I'm more interested in how you're thinking about your career arc over the next eighteen months.
+
+00:05:04.300 --> 00:05:10.000
+<v Mac>Let me start with something provocative. I think most PMs are too comfortable. They find a product area they're good at, they get in a groove, and they optimize that groove. And there's nothing wrong with that if you want to stay where you are. But if you want to grow — and I believe most of you do — comfort is a warning sign.
+
+00:05:10.300 --> 00:05:14.000
+<v Theo>What does discomfort look like productively?
+
+00:05:14.400 --> 00:05:24.000
+<v Mac>Great question. A few things. Taking on a problem you don't fully understand yet — that's productive discomfort. Owning a customer relationship where you're not the expert in the room yet. Writing a strategy doc on a topic you've never written about. Presenting to an audience that can push back harder than your team. These are the moments that accelerate growth.
+
+00:05:24.300 --> 00:05:29.000
+<v Amara>I've been in a groove for about eight months on Scan's false positive work. I know this problem really well. Should I be worried?
+
+00:05:29.400 --> 00:05:40.000
+<v Mac>Not worried — aware. Deep domain expertise has real value. The question is: are you still growing within that domain? Are you developing the reachability analysis problem in a way that's expanding how you think about vulnerability intelligence? Or are you running the same playbook on a slightly different data set?
+
+00:05:40.300 --> 00:05:47.000
+<v Amara>Honestly... I think it's been a bit of the same playbook. The govulncheck integration is new territory though — I've had to learn a lot about how Go's module system works.
+
+00:05:47.400 --> 00:05:53.000
+<v Mac>That's the leading edge of your comfort zone. Stay close to it. Bring me a write-up in our next one-on-one of what you've learned that changed how you think about this problem.
+
+00:05:53.300 --> 00:05:57.000
+<v Amara>I'll do that.
+
+00:05:57.400 --> 00:06:05.000
+<v Mac>I want to surface something else. Several of you — and I won't name names — are doing really good work that nobody outside your immediate engineering team knows about. Invisible good work is a career risk.
+
+00:06:05.300 --> 00:06:09.000
+<v Yuki>Is this about visibility in the org?
+
+00:06:09.400 --> 00:06:20.000
+<v Mac>It is. I know "visibility" sounds political and some of you will resist it. But here's how I think about it: if you solve a hard customer problem and nobody knows you solved it, the next hard customer problem won't come to you. Visibility isn't about self-promotion — it's about making sure the right people know what problems you're capable of solving.
+
+00:06:20.300 --> 00:06:25.000
+<v Ben>How do we create that visibility without it feeling like we're being showboaty?
+
+00:06:25.400 --> 00:06:35.000
+<v Mac>The best visibility is artifact-based, not announcement-based. Write a good spec and share it broadly. Write a post-launch review that tells the story of what you learned. Share customer feedback that validates a decision you made. These things build reputation without anyone feeling like you're performing.
+
+00:06:35.300 --> 00:06:40.000
+<v Fatima>I've been meaning to write up the cert expiry warning work. It's a small feature but the thinking behind the copy change was interesting.
+
+00:06:40.400 --> 00:06:48.000
+<v Mac>Write it up. Post it in the product channel. A two-paragraph write-up of "here's what we built, here's why we made the copy decision we made, here's the early data" is both useful to others and reputation-building for you.
+
+00:06:48.300 --> 00:06:53.000
+<v Fatima>I always assumed people would think it was self-congratulatory.
+
+00:06:53.400 --> 00:07:02.000
+<v Mac>The test is: is there something useful in it for someone reading it? If yes — share it. If it's purely "look what I did" without insight — don't. The cert expiry write-up would be useful. The thinking about copy as outcome framing rather than notification framing is a genuine insight.
+
+00:07:02.300 --> 00:07:07.000
+<v Fatima>Okay. I'll write it this week.
+
+00:07:07.400 --> 00:07:14.000
+<v Mac>I want to make this a norm. Once a month, I want one piece of written thinking from someone on this team in the public product channel. Not a launch announcement — a learning, an insight, a customer observation. Who's up for March?
+
+00:07:14.300 --> 00:07:18.000
+<v Raj>I'll do March. I have an interesting customer conversation from the GitHub competitive evaluation that I think others would benefit from.
+
+00:07:18.400 --> 00:07:23.000
+<v Mac>Perfect. Raj, March is yours. I'll hold you to it. Who wants April?
+
+00:07:23.300 --> 00:07:26.000
+<v Theo>I'll take April. The govulncheck spike findings are worth sharing more broadly.
+
+00:07:26.400 --> 00:07:30.000
+<v Mac>Great. Theo, April. I'll track these. Let's make it a team habit.
+
+00:07:30.300 --> 00:07:38.000
+<v Mac>Okay. I want to close with something a little reflective. It's the last day of February and I want to look back at the month for a minute. Four weeks ago this team was coming off a stressful Q4 close with some anxiety about headcount and some coordination gaps that were causing real problems. Where are we now?
+
+00:07:38.300 --> 00:07:43.000
+<v Chloe>The Infra changes digest is running and has already prevented one near-miss. Lena and I saw a change in Monday's digest that would have affected the Release pipeline and we flagged it before it shipped.
+
+00:07:43.400 --> 00:07:47.000
+<v Lena>That was a good catch. The process worked exactly as intended.
+
+00:07:47.300 --> 00:07:52.000
+<v Omar>The cross-team PM syncs are happening. Diana and I had our first one last week. We found two more dependency overlaps we hadn't previously identified.
+
+00:07:52.400 --> 00:07:56.000
+<v Mac>Two more overlaps found before they became customer-facing surprises. That's the value of the structure.
+
+00:07:56.300 --> 00:08:01.000
+<v Diana>The SBOM signing integration is actually in the Q2 roadmap now because Priya and Lena talked. Six weeks ago neither team knew the other cared about it.
+
+00:08:01.400 --> 00:08:07.000
+<v Mac>That's a feature that exists because two PMs had a conversation. This is what I mean about the work mattering.
+
+00:08:07.300 --> 00:08:13.000
+<v Jordan>Personally — I feel like I have a clearer picture of where I'm going this year than I did at the start of February. The career conversations have been really useful.
+
+00:08:13.400 --> 00:08:19.000
+<v Mac>I'm glad Jordan. That's one of the things I care about most in this role — that everyone on this team feels like they're growing, not just executing. If you're just executing, I'm not doing my job.
+
+00:08:19.300 --> 00:08:25.000
+<v Priya>I want to say — I've managed up in a few organizations and the transparency you bring to headcount and org changes is not universal. It matters.
+
+00:08:25.400 --> 00:08:32.000
+<v Mac>I appreciate that Priya. I believe transparency is how you build teams that can handle uncertainty without falling apart. You deserve to know what's happening so you can make good decisions. I'll always tell you what I can.
+
+00:08:32.300 --> 00:08:40.000
+<v Mac>Okay. Last things. Team updates — I'm going to go fast since we're at time. Two sentences per person, start with your biggest win this week and the top thing you're watching. Priya?
+
+00:08:40.400 --> 00:08:47.000
+<v Priya>Biggest win: key rotation GA confirmed for next sprint with all three success criteria met including rollback. Watching: the Notation CLI spike Fatima is starting — want to make sure we scope the decision doc correctly.
+
+00:08:47.300 --> 00:08:52.000
+<v Jordan>Win: webhooks shipped to production and two customers are already using them. Watching: adoption rate over the next two weeks.
+
+00:08:52.300 --> 00:08:57.000
+<v Fatima>Win: cert expiry warning is in production, fifteen percent higher renewal rate in the first week versus the control. Watching: starting the Notation CLI spike today.
+
+00:08:57.400 --> 00:09:02.000
+<v Lena>Win: DB refactor sprint one complete, thread-safety issues resolved faster than expected. Watching: sprint two — the actual parallelization work. That's where the real complexity is.
+
+00:09:02.300 --> 00:09:07.000
+<v Theo>Win: govulncheck integration kicked off, engineering team is energized by the problem. Watching: will the forty percent false positive reduction hold up in production or was the spike data cherry-picked?
+
+00:09:07.400 --> 00:09:12.000
+<v Mac>Theo — that self-skepticism is a good sign. Don't let the spike data be the whole story. Design the production measurement carefully.
+
+00:09:12.300 --> 00:09:16.000
+<v Amara>Win: policy template gallery shipped to production and adoption jumped from fifteen to twenty-two percent in one week. Watching: which templates are getting used and which aren't — that'll tell us what to build next.
+
+00:09:16.400 --> 00:09:21.000
+<v Omar>Win: multi-region design doc approved by Raza, engineering starting sprint one next week. Watching: first week of implementation — this is new territory for the team.
+
+00:09:21.300 --> 00:09:26.000
+<v Chloe>Win: environment dependency feature in engineering sprint two, ahead of schedule. Watching: the compliance audit angle — did the ISO 27001 customer see our announcement about this feature?
+
+00:09:26.400 --> 00:09:30.000
+<v Mac>Chloe — make sure that customer hears about it directly from you, not from an announcement. A personal note goes much further.
+
+00:09:30.300 --> 00:09:35.000
+<v Chloe>Sending it today.
+
+00:09:35.400 --> 00:09:40.000
+<v Raj>Win: competitive analysis for Release posted, got three comments from engineers who didn't know GitLab had those capabilities. Watching: customer decision from the GitLab evaluation — should hear back Friday.
+
+00:09:40.300 --> 00:09:45.000
+<v Diana>Win: cohort analysis showing two-times faster expansion for org hierarchy customers — that's the number that's going in the deck. Watching: the license transfer feature engineering kick-off next week.
+
+00:09:45.400 --> 00:09:50.000
+<v Yuki>Win: license transfer wireframes handed off to engineering. Watching: the first engineering estimate — I'm slightly nervous we scoped the auth dependencies correctly.
+
+00:09:50.300 --> 00:09:55.000
+<v Ben>Win: contract management spec reviewed by Mac, incorporated feedback, ready for engineering review. Watching: the three customer calls I have next week — want to validate the renewal anxiety framing before we start building.
+
+00:09:55.400 --> 00:10:02.000
+<v Mac>Ben — validating before building is the right instinct, not a sign of slowness. Keep that standard.
+
+00:10:02.300 --> 00:10:12.000
+<v Mac>Okay. February done. Strong month. Strategic narratives are ready for tomorrow. Cross-team coordination is structurally improved. Key features shipped. Careers are moving. That's a good month. Go do great work in March. I'll see you next Wednesday.
+
+00:10:12.300 --> 00:10:15.000
+<v Priya>Good luck tomorrow Mac. The narratives are going to land well.
+
+00:10:15.400 --> 00:10:18.000
+<v Omar>Thanks for the month Mac. See everyone next week.
+
+00:10:18.300 --> 00:10:21.000
+<v Diana>Strong month everyone. See you Wednesday.

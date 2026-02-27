@@ -1,0 +1,319 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+<v Stuart>Okay, Scan team — Q3 product review. Let's get into it. Lena, do you want to walk us through where we landed?
+
+00:00:05.300 --> 00:00:10.000
+<v Lena>Sure. So Q3 was a mixed bag honestly. We shipped a lot but we also hit some walls I want to be transparent about.
+
+00:00:10.300 --> 00:00:14.000
+<v Raza>I appreciate that framing. Let's hear it.
+
+00:00:14.400 --> 00:00:24.000
+<v Lena>We committed to four things. SBOM generation support, container image scanning at sub-thirty-second p95, a false positive reduction initiative, and a new policy engine for scan gates. We shipped SBOM and the policy engine. We missed the latency target and the false positive work is ongoing.
+
+00:00:24.300 --> 00:00:29.000
+<v Raza>Talk to me about the latency miss. We've been at this for two quarters now.
+
+00:00:29.400 --> 00:00:41.000
+<v Lena>The problem is structural. Our scanner architecture was designed for sequential processing — we pull the image layers, scan each one, aggregate results. For small images that's fine. For images over two gigabytes, sequential layer processing blows past thirty seconds almost every time.
+
+00:00:41.300 --> 00:00:47.000
+<v Raza>And the fix is parallel layer processing which you've been scoping for how long?
+
+00:00:47.400 --> 00:00:55.000
+<v Lena>We've been scoping it for one quarter. The challenge is the vulnerability database lookup — it's not thread-safe right now. We'd have to refactor the DB client before we can safely parallelize.
+
+00:00:55.300 --> 00:01:02.000
+<v Raza>So the refactor is the blocker. How long is that refactor?
+
+00:01:02.400 --> 00:01:09.000
+<v Lena>Three sprints to make the DB client thread-safe. One sprint to parallelize. One sprint to test and tune. So five sprints total — roughly ten weeks.
+
+00:01:09.300 --> 00:01:15.000
+<v Stuart>Ten weeks means this doesn't land until late Q4 at the earliest.
+
+00:01:15.400 --> 00:01:20.000
+<v Lena>Yes. And I'd rather give you that honest number than promise Q3 for a third time.
+
+00:01:20.300 --> 00:01:26.000
+<v Stuart>I respect that. What's the customer impact in the meantime? Are we losing deals over this?
+
+00:01:26.400 --> 00:01:36.000
+<v Lena>We lost one evaluation last month — the financial services company, Apex Bank. Their requirement was twenty seconds at p95. We were at forty-two. They went with a competitor.
+
+00:01:36.300 --> 00:01:41.000
+<v Stuart>That's painful. What was the deal size?
+
+00:01:41.400 --> 00:01:45.000
+<v Lena>I don't know the exact number — you'd have to ask sales. But it was a named account opportunity.
+
+00:01:45.300 --> 00:01:51.000
+<v Stuart>Raza, we need to figure out if there's a way to accelerate this. Can we throw more engineering at it?
+
+00:01:51.400 --> 00:01:59.000
+<v Raza>What would it take to compress to six weeks instead of ten, Lena?
+
+00:01:59.300 --> 00:02:08.000
+<v Lena>One additional senior engineer on the DB client refactor. Right now Tariq is doing it solo. With one more senior person we could parallelize the refactor itself and cut probably three weeks.
+
+00:02:08.300 --> 00:02:13.000
+<v Raza>Who do we have available? I'll look at the bench after this session. Stuart, the headcount conversation is coming.
+
+00:02:13.400 --> 00:02:18.000
+<v Stuart>I know. Let's keep moving. False positive work — tell me the honest story there.
+
+00:02:18.400 --> 00:02:30.000
+<v Lena>So our false positive rate for container image scanning is sitting at about eight percent. That means roughly one in twelve vulnerabilities we flag is actually not exploitable in the customer's context. Customers are fatigued. We've had three support tickets this week alone from teams who want to suppress specific CVEs.
+
+00:02:30.300 --> 00:02:36.000
+<v Stuart>Eight percent sounds low but in a scan of five hundred packages that's forty false alerts.
+
+00:02:36.400 --> 00:02:42.000
+<v Lena>Exactly. And in high-volume CI pipelines it adds up fast. The industry standard for mature scanners is under three percent.
+
+00:02:42.300 --> 00:02:47.000
+<v Raza>What's driving the false positives? Is this our detection logic or the vulnerability database we're pulling from?
+
+00:02:47.400 --> 00:02:58.000
+<v Lena>Both. The vulnerability databases — NVD, OSV, GitHub Advisory — have inconsistencies. A CVE might be marked as affecting a broad version range when really only a specific build configuration is vulnerable. Our scanner doesn't understand build context.
+
+00:02:58.300 --> 00:03:05.000
+<v Raza>So we need context-aware scanning — understanding what's actually reachable in the built artifact, not just what version is present.
+
+00:03:05.400 --> 00:03:13.000
+<v Lena>That's the full vision. Reachability analysis. It's a hard problem and the teams doing it well — Snyk, for example — have been investing in it for years.
+
+00:03:13.300 --> 00:03:20.000
+<v Stuart>Are we going to build reachability analysis ourselves or find a way to leverage existing work?
+
+00:03:20.400 --> 00:03:29.000
+<v Lena>I've been looking at an open source project called govulncheck for Go, and osv-scanner. We could integrate them for specific ecosystems as a complement to our own scanning.
+
+00:03:29.300 --> 00:03:35.000
+<v Stuart>Integrate meaning we embed them or we call them as a service?
+
+00:03:35.400 --> 00:03:42.000
+<v Lena>Embed as optional analyzers. Customer enables enhanced scanning for a specific language ecosystem, we run the additional analyzer, reduce false positives for that stack.
+
+00:03:42.300 --> 00:03:48.000
+<v Raza>I like that approach more than building it ourselves. What's the licensing situation on those tools?
+
+00:03:48.400 --> 00:03:54.000
+<v Lena>govulncheck is Apache 2.0. osv-scanner is Apache 2.0. Clean from a licensing perspective.
+
+00:03:54.300 --> 00:04:00.000
+<v Raza>Good. Let's make that a Q4 initiative. Scope out a phased integration — start with Go, add more ecosystems over time.
+
+00:04:00.400 --> 00:04:07.000
+<v Lena>That works. I'd want to do a spike first to understand the integration surface before committing to a timeline.
+
+00:04:07.300 --> 00:04:11.000
+<v Stuart>How big is your Go customer base relative to other language ecosystems?
+
+00:04:11.400 --> 00:04:19.000
+<v Lena>Go is about twenty-two percent of our scanning volume. Java is the biggest at thirty-eight percent. Python is second at twenty-seven.
+
+00:04:19.300 --> 00:04:26.000
+<v Stuart>Should we start with Java or Python then? More customers benefit immediately.
+
+00:04:26.400 --> 00:04:35.000
+<v Lena>The challenge is the Java ecosystem is complex — Maven, Gradle, different dependency resolution strategies. The false positive problem there is harder to solve. Go is simpler to start with, we can prove the model works, then expand.
+
+00:04:35.300 --> 00:04:40.000
+<v Stuart>Okay. Prove it with Go, roadmap Java for Q1. Fair.
+
+00:04:40.400 --> 00:04:46.000
+<v Raza>Let's talk about the policy engine you shipped. I've heard some mixed feedback. What's the adoption looking like?
+
+00:04:46.400 --> 00:04:57.000
+<v Lena>We shipped the policy engine and about fifteen percent of active customers have configured at least one scan gate policy. Which honestly is better than I expected for the first quarter, but there's a long tail of customers who haven't touched it.
+
+00:04:57.300 --> 00:05:03.000
+<v Stuart>Fifteen percent after one quarter — is that good adoption or bad?
+
+00:05:03.400 --> 00:05:12.000
+<v Lena>For a power feature, I'd say it's okay. The customers who have adopted it are enthusiastic — we've had three NPS comments specifically praising the policy engine. The problem is discoverability.
+
+00:05:12.300 --> 00:05:18.000
+<v Stuart>They don't know it exists?
+
+00:05:18.400 --> 00:05:27.000
+<v Lena>Some don't. Others found it but got lost in the configuration. The policy DSL is flexible but intimidating. We don't have a good set of starter templates.
+
+00:05:27.300 --> 00:05:34.000
+<v Stuart>Templates seem like a quick win. Can we ship a library of common policies — SLSA compliance, SOC2, PCI?
+
+00:05:34.400 --> 00:05:42.000
+<v Lena>We have five templates drafted but they're sitting in a doc. We haven't surfaced them in the product. A week of work to integrate them into the UI as a starter gallery.
+
+00:05:42.300 --> 00:05:47.000
+<v Stuart>One week of work could meaningfully move adoption. Let's do it.
+
+00:05:47.400 --> 00:05:52.000
+<v Raza>Let's also think about in-app education. Something that proactively surfaces the policy engine when a customer hits their first high severity finding.
+
+00:05:52.300 --> 00:06:00.000
+<v Lena>That's a smart trigger. If you get your first critical CVE and you don't have a scan gate, we show you a prompt: "Want to block future deployments with critical vulnerabilities?" Two clicks to turn it on.
+
+00:06:00.300 --> 00:06:05.000
+<v Stuart>That's exactly the kind of contextual onboarding we should be doing. Can we get that into Q4?
+
+00:06:05.400 --> 00:06:11.000
+<v Lena>Yes. Two sprints. One to build the trigger logic, one to design and implement the prompt flow with the design team.
+
+00:06:11.300 --> 00:06:17.000
+<v Stuart>Good. Let me ask about SBOM since you called that a win. Who's actually using SBOM generation and what for?
+
+00:06:17.400 --> 00:06:28.000
+<v Lena>We have twenty-one customers generating SBOMs. Most are using them for compliance — either EO14028 requirements or enterprise procurement requirements from their own customers. We're generating in CycloneDX and SPDX formats.
+
+00:06:28.300 --> 00:06:34.000
+<v Stuart>Is there a management story around SBOMs? Or are we just generating and dropping them somewhere?
+
+00:06:34.400 --> 00:06:44.000
+<v Lena>Generating and dropping. Customers export the SBOM file and manage it themselves. The next level would be SBOM management — diff between versions, track when new components are introduced, alert on license changes.
+
+00:06:44.300 --> 00:06:50.000
+<v Stuart>That's a whole product area. Is that something we want to build or is that out of scope for Scan?
+
+00:06:50.400 --> 00:06:59.000
+<v Lena>I think it's in scope long term. Short term, we could do simple versioning — store SBOMs per release, let customers compare two SBOMs. That's lower effort than full management.
+
+00:06:59.300 --> 00:07:05.000
+<v Stuart>Let's put SBOM diff on the Q4 roadmap as a stretch goal. Not a commitment but if we have capacity.
+
+00:07:05.400 --> 00:07:10.000
+<v Raza>I want to understand the scanning infrastructure health. What does our scanner fleet look like?
+
+00:07:10.400 --> 00:07:22.000
+<v Lena>We're running a fleet of about forty scanning worker nodes. Autoscaling up to sixty during peak hours. CPU utilization is healthy but memory is concerning — we've had three OOM kills in the last two weeks on large image scans.
+
+00:07:22.300 --> 00:07:27.000
+<v Raza>OOM kills meaning the scan job dies and the customer gets an error?
+
+00:07:27.400 --> 00:07:35.000
+<v Lena>Correct. We retry automatically but the retry sometimes OOMs again if the image is consistently large. We have five customers with images over three gigabytes who hit this regularly.
+
+00:07:35.300 --> 00:07:41.000
+<v Raza>That's a reliability incident waiting to happen. What's the mitigation?
+
+00:07:41.400 --> 00:07:51.000
+<v Lena>Short term — increase worker memory limits for large image jobs. We can do that with a config change. Longer term — streaming layer analysis so we don't need to hold the whole image in memory.
+
+00:07:51.300 --> 00:07:56.000
+<v Raza>Do the config change today. Don't wait for a planning cycle for a reliability fix.
+
+00:07:56.400 --> 00:08:01.000
+<v Lena>Done. I'll have that deployed before EOD.
+
+00:08:01.300 --> 00:08:08.000
+<v Stuart>What's the streaming layer analysis effort? That sounds related to the parallelization work.
+
+00:08:08.400 --> 00:08:17.000
+<v Lena>They're related but not the same. Streaming is about memory footprint — process layers as you pull them. Parallelization is about throughput — process multiple layers at once. They're complementary and the DB refactor enables both.
+
+00:08:17.300 --> 00:08:23.000
+<v Raza>So the DB refactor is foundational to multiple improvements. That reinforces prioritizing it.
+
+00:08:23.400 --> 00:08:28.000
+<v Lena>Exactly. It unblocks at least three things on our Q4 roadmap.
+
+00:08:28.300 --> 00:08:35.000
+<v Stuart>Let's talk competitors for a minute. Grype, Trivy, Snyk — where are we differentiated?
+
+00:08:35.400 --> 00:08:47.000
+<v Lena>Our differentiation is the pipeline integration depth and the policy engine. Trivy and Grype are great standalone scanners but they're tools, not platforms. We're embedded in the release workflow in a way that standalone tools aren't. Snyk is more direct competition — they have a platform too.
+
+00:08:47.300 --> 00:08:54.000
+<v Stuart>How do we compare to Snyk on scan speed?
+
+00:08:54.400 --> 00:09:02.000
+<v Lena>Snyk is faster on most workloads. Their cloud-based scanning is snappy. We're competitive on smaller images but they win on large images right now.
+
+00:09:02.300 --> 00:09:08.000
+<v Stuart>So fixing the large image latency isn't just a quality issue — it's a competitive gap.
+
+00:09:08.400 --> 00:09:13.000
+<v Lena>Yes. And it's the thing that's been losing us deals.
+
+00:09:13.300 --> 00:09:19.000
+<v Raza>Understood. The DB refactor and parallelization is the top technical priority for Q4 then. Full stop.
+
+00:09:19.400 --> 00:09:25.000
+<v Lena>Agreed. I want to be clear that it's technically risky work though. We're changing the core engine.
+
+00:09:25.300 --> 00:09:31.000
+<v Raza>I hear you. What's our test coverage on the scanner engine right now?
+
+00:09:31.400 --> 00:09:39.000
+<v Lena>Unit coverage is good — around eighty-two percent. Integration test coverage is weaker. We have a lot of integration tests but they're slow and flaky. Flakiness means people ignore failures.
+
+00:09:39.300 --> 00:09:46.000
+<v Raza>We need to fix the flaky tests before we do the engine refactor. I don't want to refactor on a test suite we can't trust.
+
+00:09:46.400 --> 00:09:53.000
+<v Lena>Agreed. We've been wanting to do a test quality sprint for a while. Can we make that sprint zero of the DB refactor project?
+
+00:09:53.300 --> 00:09:58.000
+<v Raza>Yes. Two weeks on test quality, then the refactor. Stuart, that pushes the timeline by two weeks.
+
+00:09:58.400 --> 00:10:04.000
+<v Stuart>I'd rather have a solid refactor than a fast one that causes a regression. Go for it.
+
+00:10:04.300 --> 00:10:12.000
+<v Lena>Good. Last thing I want to cover — we've had some requests for scanning non-container artifacts. Helm charts, Terraform modules, ARM templates.
+
+00:10:12.300 --> 00:10:18.000
+<v Stuart>That's IaC scanning. That's a big surface area. Are customers actually asking or is this a team idea?
+
+00:10:18.400 --> 00:10:27.000
+<v Lena>We have seven explicit customer requests. I want to be careful about scope creep though. We should decide if IaC scanning is a direction we want to go or if it dilutes our container and package focus.
+
+00:10:27.300 --> 00:10:34.000
+<v Stuart>I've been thinking about this too. I think there's a version where we say: Scan is the tool you use in your CI pipeline for any artifact, not just containers. That's a broader platform story.
+
+00:10:34.400 --> 00:10:40.000
+<v Raza>That's a meaningful scope expansion. Do we have the vulnerability intelligence for IaC? Do we know what a vulnerable Terraform module looks like?
+
+00:10:40.300 --> 00:10:49.000
+<v Lena>It's different from CVEs — it's misconfiguration detection, not vulnerability detection. Tools like Checkov and tfsec already do this. We could integrate or build our own rules engine.
+
+00:10:49.300 --> 00:10:55.000
+<v Stuart>Let's not build a misconfiguration engine from scratch. Can we integrate Checkov?
+
+00:10:55.400 --> 00:11:02.000
+<v Lena>Checkov is Apache 2.0. We could embed it. Customers get IaC scanning with our policy integration on top.
+
+00:11:02.300 --> 00:11:08.000
+<v Stuart>That's a faster path to market. Let's put that on the roadmap as a Q4 spike with a Q1 delivery target.
+
+00:11:08.400 --> 00:11:15.000
+<v Raza>I want the spike to answer three questions: integration complexity, performance overhead, and licensing implications at scale.
+
+00:11:15.400 --> 00:11:20.000
+<v Lena>I'll structure the spike doc around those three questions. Good framing.
+
+00:11:20.300 --> 00:11:27.000
+<v Stuart>Alright. Raza, any final technical concerns before we close out?
+
+00:11:27.400 --> 00:11:36.000
+<v Raza>Just the OOM situation — I want a post-incident review even though we're handling it operationally. We should document the root cause and what we're doing to prevent it from happening to new customers automatically.
+
+00:11:36.300 --> 00:11:41.000
+<v Lena>I'll have a post-incident doc up by end of week.
+
+00:11:41.400 --> 00:11:48.000
+<v Raza>Good session. Here's my summary: DB refactor is Q4 priority one, preceded by a test quality sprint. False positive reduction via open source integration starts with Go. Policy engine adoption — templates and contextual prompt in Q4. OOM memory limits deployed today. IaC scanning — spike in Q4, delivery in Q1. Any corrections?
+
+00:11:48.300 --> 00:11:53.000
+<v Lena>Add the SBOM diff as a stretch goal and you've got it.
+
+00:11:53.400 --> 00:11:57.000
+<v Raza>Right, SBOM diff as stretch. Stuart?
+
+00:11:57.400 --> 00:12:03.000
+<v Stuart>All sounds right to me. Good work Lena. Thanks for being straight with us about the misses. That's how we want these reviews to go.
+
+00:12:03.300 --> 00:12:08.000
+<v Lena>Appreciate it. See everyone next session.
