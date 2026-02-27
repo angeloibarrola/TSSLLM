@@ -40,10 +40,18 @@ def create_team(body: TeamCreate = TeamCreate(), db: Session = Depends(get_db)):
 
 @router.get("/demo")
 def get_demo_team(db: Session = Depends(get_db)):
+    from app.models.workspace import Workspace
     team = db.query(Team).filter(Team.id == DEMO_TEAM_ID).first()
     if not team:
         raise HTTPException(status_code=404, detail="Demo workspace not available")
-    return {"id": team.id, "name": team.name, "join_code": team.join_code, "created_at": team.created_at}
+    pm_notebook = db.query(Workspace).filter(
+        Workspace.team_id == DEMO_TEAM_ID, Workspace.name == "PM Team Meetings"
+    ).first()
+    return {
+        "id": team.id, "name": team.name, "join_code": team.join_code,
+        "created_at": team.created_at,
+        "default_notebook_id": pm_notebook.id if pm_notebook else None,
+    }
 
 
 @router.get("/{team_id}")

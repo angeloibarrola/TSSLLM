@@ -118,7 +118,7 @@ export const teamApi = {
       body: JSON.stringify({ code }),
     }),
   demo: () =>
-    request<import("../types").Team>("/api/teams/demo"),
+    request<import("../types").Team & { default_notebook_id?: string }>("/api/teams/demo"),
   rename: (id: string, name: string) =>
     request<import("../types").Team>(`/api/teams/${id}`, {
       method: "PATCH",

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Loader2, BookmarkPlus, Sparkles } from "lucide-react";
+import { Send, Loader2, BookmarkPlus, Sparkles, Copy, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import type { Api } from "../../api/client";
 import type { ChatMessage } from "../../types";
@@ -12,6 +12,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [followups, setFollowups] = useState<string[]>([]);
   const [loadingFollowups, setLoadingFollowups] = useState(false);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -203,13 +204,26 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
               )}
             </div>
             {msg.role === "assistant" && (
-              <button
-                onClick={() => onSaveToNote(msg.content)}
-                className="mt-1 flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors"
-              >
-                <BookmarkPlus size={12} />
-                Save to Note
-              </button>
+              <div className="mt-1 flex items-center gap-1">
+                <button
+                  onClick={() => onSaveToNote(msg.content)}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors"
+                >
+                  <BookmarkPlus size={12} />
+                  Save to Note
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(msg.content);
+                    setCopiedId(msg.id);
+                    setTimeout(() => setCopiedId(null), 2000);
+                  }}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors"
+                >
+                  {copiedId === msg.id ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
+                  {copiedId === msg.id ? "Copied!" : "Copy"}
+                </button>
+              </div>
             )}
           </div>
         ))}

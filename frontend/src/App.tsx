@@ -6,52 +6,95 @@ import { LandingPage } from "./components/LandingPage";
 import { WorkspaceHome } from "./components/WorkspaceHome";
 import type { Team } from "./types";
 
-const TEAM_KEY = "tssllm_team_id";
+const TEAMS_KEY = "tssllm_teams";
+
+function getStoredTeamIds(): string[] {
+  try {
+    const raw = localStorage.getItem(TEAMS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function storeTeamId(id: string) {
+  const ids = getStoredTeamIds();
+  if (!ids.includes(id)) {
+    ids.unshift(id);
+    localStorage.setItem(TEAMS_KEY, JSON.stringify(ids));
+  }
+}
+
+function removeStoredTeamId(id: string) {
+  const ids = getStoredTeamIds().filter((i) => i !== id);
+  localStorage.setItem(TEAMS_KEY, JSON.stringify(ids));
+}
 
 function App() {
   const [team, setTeam] = useState<Team | null>(null);
   const [notebookId, setNotebookId] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(true);
+  const [savedTeams, setSavedTeams] = useState<Team[]>([]);
 
-  // Restore team from localStorage or URL on mount
+  // Fetch details for all stored team IDs
+  const refreshSavedTeams = useCallback(async () => {
+    const ids = getStoredTeamIds();
+    const teams: Team[] = [];
+    for (const id of ids) {
+      try {
+        const t = await teamApi.get(id);
+        teams.push(t);
+      } catch {
+        removeStoredTeamId(id);
+      }
+    }
+    setSavedTeams(teams);
+    return teams;
+  }, []);
+
+  // On mount: check URL, then load saved teams
   useEffect(() => {
     const init = async () => {
-      // Check URL first: /t/{teamId}...
       const urlMatch = window.location.pathname.match(/^\/t\/([a-f0-9-]{36})/);
-      const storedId = urlMatch?.[1] || localStorage.getItem(TEAM_KEY);
-
-      if (storedId) {
+      if (urlMatch) {
         try {
-          const t = await teamApi.get(storedId);
+          const t = await teamApi.get(urlMatch[1]);
           setTeam(t);
-          localStorage.setItem(TEAM_KEY, t.id);
-
-          // Check if URL also has a notebook
+          storeTeamId(t.id);
           const nbMatch = window.location.pathname.match(/\/w\/([a-f0-9-]{36})/);
-          if (nbMatch) {
-            setNotebookId(nbMatch[1]);
-          }
+          if (nbMatch) setNotebookId(nbMatch[1]);
         } catch {
-          localStorage.removeItem(TEAM_KEY);
+          // invalid URL team — fall through to landing
         }
       }
+      await refreshSavedTeams();
       setInitializing(false);
     };
     init();
   }, []);
 
-  const handleTeamReady = useCallback((t: Team) => {
+  const handleTeamReady = useCallback(async (t: Team, defaultNotebookId?: string) => {
     setTeam(t);
-    localStorage.setItem(TEAM_KEY, t.id);
-    window.history.replaceState(null, "", `/t/${t.id}`);
-  }, []);
+    storeTeamId(t.id);
+    await refreshSavedTeams();
+    if (defaultNotebookId) {
+      setNotebookId(defaultNotebookId);
+      window.history.replaceState(null, "", `/t/${t.id}/w/${defaultNotebookId}`);
+    } else {
+      window.history.replaceState(null, "", `/t/${t.id}`);
+    }
+  }, [refreshSavedTeams]);
 
   const handleLeave = useCallback(() => {
     setTeam(null);
     setNotebookId(null);
-    localStorage.removeItem(TEAM_KEY);
     window.history.replaceState(null, "", "/");
   }, []);
+
+  const handleRemoveTeam = useCallback(async (id: string) => {
+    removeStoredTeamId(id);
+    await refreshSavedTeams();
+  }, [refreshSavedTeams]);
 
   const handleOpenNotebook = useCallback((id: string) => {
     setNotebookId(id);
@@ -86,7 +129,7 @@ function App() {
 
   // No team → Landing Page
   if (!team) {
-    return <LandingPage onTeamReady={handleTeamReady} />;
+    return <LandingPage onTeamReady={handleTeamReady} savedTeams={savedTeams} onRemoveTeam={handleRemoveTeam} />;
   }
 
   // Team but no notebook selected → Workspace Home
@@ -96,7 +139,7 @@ function App() {
         team={team}
         onOpenNotebook={handleOpenNotebook}
         onLeave={handleLeave}
-        onTeamUpdated={(t) => { setTeam(t); localStorage.setItem(TEAM_KEY, t.id); }}
+        onTeamUpdated={(t) => { setTeam(t); refreshSavedTeams(); }}
       />
     );
   }
