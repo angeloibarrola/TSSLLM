@@ -14,6 +14,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const [loadingFollowups, setLoadingFollowups] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const pendingTeachRef = useRef<string | null>(null);
 
   useEffect(() => {
     api.getMessages().then(setMessages).catch(() => {});
@@ -39,6 +40,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
   const SLASH_COMMANDS: Record<string, string> = {
     "/new": "Clear the chat and start a fresh conversation",
     "/restore": "Restore all previous messages",
+    "/teach": "Explain a topic with clarity and intuition — usage: /teach <topic>",
     "/help": "Show available commands",
   };
 
@@ -55,6 +57,41 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
         api.getMessages().then(setMessages).catch(() => {});
       }).catch(() => {});
       return true;
+    }
+
+    if (cmd.startsWith("/teach")) {
+      const topic = command.replace(/^\/teach\s*/i, "").trim();
+      if (!topic) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            role: "assistant",
+            content: "Please provide a topic. Usage: **/teach** `<topic or question>`",
+            sources_cited: null,
+            created_at: new Date().toISOString(),
+          },
+        ]);
+        return true;
+      }
+      // Store the enriched prompt, let handleSend continue with original text
+      pendingTeachRef.current = `Explain this topic as if you are a world-class teacher who combines Andrej Karpathy's clarity and intuition for complex technical ideas and Richard Feynman's ability to simplify without dumbing down.
+
+Follow these rules:
+1. Start with a plain-language explanation a smart 12-year-old could understand.
+2. Then give a slightly more technical explanation for a college student.
+3. Use analogies, metaphors, and real-world examples.
+4. Avoid jargon unless you immediately explain it.
+5. Break the idea into small logical steps instead of big jumps.
+6. Include a short "why this matters" section.
+7. End with one intuitive mental model or visual description I can remember.
+8. If useful, add a tiny example or mini scenario.
+9. For deeper technical clarity, provide the underlying mechanics, but keep them approachable.
+10. For product/engineering context, include how this concept appears in real software systems or products.
+11. End with a one-sentence "sticky summary" I could tweet.
+
+The topic to teach: ${topic}`;
+      return false; // let handleSend continue
     }
 
     if (cmd === "/help") {
@@ -99,9 +136,17 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
 
     // Handle slash commands locally
     if (userContent.startsWith("/")) {
-      handleSlashCommand(userContent);
-      return;
+      if (!handleSlashCommand(userContent)) {
+        // handleSlashCommand returned false — check if a /teach prompt is pending
+      } else {
+        return;
+      }
     }
+
+    // Determine what to send to the API (may be enriched by /teach)
+    const apiContent = pendingTeachRef.current || userContent;
+    pendingTeachRef.current = null;
+    const displayContent = userContent.startsWith("/teach") ? userContent.replace(/^\/teach\s*/i, "").trim() : userContent;
 
     setSuggestions([]);
     setFollowups([]);
@@ -110,7 +155,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
     const tempUser: ChatMessage = {
       id: Date.now(),
       role: "user",
-      content: userContent,
+      content: displayContent,
       sources_cited: null,
       created_at: new Date().toISOString(),
     };
@@ -119,7 +164,7 @@ export function ChatPane({ api, refreshKey, enabledSourceIds, onSaveToNote }: { 
 
     try {
       const sourceIds = enabledSourceIds.size > 0 ? Array.from(enabledSourceIds) : undefined;
-      await api.sendMessage(userContent, sourceIds);
+      await api.sendMessage(apiContent, sourceIds);
       // Refresh all messages to get proper IDs
       const updated = await api.getMessages();
       setMessages(updated);
