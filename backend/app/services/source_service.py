@@ -68,12 +68,43 @@ class SourceService:
             response = await client.get(url)
             response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
-        for tag in soup(["script", "style", "nav", "footer", "header"]):
-            tag.decompose()
         title = soup.title.string.strip() if soup.title and soup.title.string else url
-        text = soup.get_text(separator="\n", strip=True)
-        # Clean up excessive newlines
-        lines = [line.strip() for line in text.splitlines() if line.strip()]
+
+        # Try to find the main content area (works for most sites including MS Learn, MDN, etc.)
+        content = (
+            soup.find("article")
+            or soup.find(id="main")
+            or soup.find("main")
+            or soup.find(attrs={"role": "main"})
+            or soup  # fallback to full page
+        )
+
+        # Remove non-content elements
+        for tag in content(["script", "style", "nav", "footer", "header", "aside", "button", "form"]):
+            tag.decompose()
+        # Remove common UI noise (feedback widgets, share buttons, breadcrumbs, etc.)
+        noise_selectors = [
+            "[aria-hidden=true]", ".feedback-section", ".page-actions",
+            ".sidebar", ".toc", ".table-of-contents", ".breadcrumb",
+            "[role=navigation]", "[role=complementary]",
+        ]
+        for sel in noise_selectors:
+            for el in content.select(sel):
+                el.decompose()
+
+        # Insert newlines between block elements for structure, spaces for inline
+        for br in content.find_all("br"):
+            br.replace_with("\n")
+        for tag in content.find_all(["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li", "tr", "blockquote", "pre"]):
+            tag.insert_before("\n")
+            tag.insert_after("\n")
+        text = content.get_text(separator=" ", strip=False)
+        # Clean up: collapse internal whitespace, split on newlines, drop empties
+        lines = []
+        for line in text.splitlines():
+            line = " ".join(line.split())
+            if line:
+                lines.append(line)
         return title, "\n\n".join(lines)
 
     @staticmethod
