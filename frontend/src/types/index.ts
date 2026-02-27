@@ -1,7 +1,20 @@
+export interface Team {
+  id: string;
+  name: string;
+  join_code: string;
+  created_at: string;
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
 export interface Source {
   id: number;
   name: string;
-  source_type: "docx" | "url" | "sharepoint" | "paste" | "vtt";
+  source_type: "docx" | "url" | "sharepoint" | "paste" | "vtt" | "pdf";
   url: string | null;
   file_path: string | null;
   content_text?: string | null;

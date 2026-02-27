@@ -34,8 +34,8 @@ async def sharepoint_login():
 
 @router.post("/upload", response_model=SourceResponse)
 async def upload_file(workspace_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not file.filename or not file.filename.lower().endswith((".docx", ".vtt")):
-        raise HTTPException(status_code=400, detail="Only .docx and .vtt files are supported")
+    if not file.filename or not file.filename.lower().endswith((".docx", ".vtt", ".pdf")):
+        raise HTTPException(status_code=400, detail="Only .docx, .vtt, and .pdf files are supported")
     file_id = uuid.uuid4().hex[:8]
     file_path = os.path.join(settings.upload_dir, f"{file_id}_{file.filename}")
     content = await file.read()

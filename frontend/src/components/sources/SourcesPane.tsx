@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { FileUp, Globe, Trash2, Loader2, ClipboardPaste, X, CheckSquare, Square } from "lucide-react";
-import { api } from "../../api/client";
+import type { Api } from "../../api/client";
 import type { Source } from "../../types";
 
 interface SourcesPaneProps {
+  api: Api;
+  refreshKey: number;
   onSelectSource: (id: number) => void;
   selectedSourceId: number | null;
   enabledSourceIds: Set<number>;
@@ -12,7 +14,7 @@ interface SourcesPaneProps {
   onSourcesChanged: (sourceIds: number[]) => void;
 }
 
-export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds, onToggleSource, onSetAllSources, onSourcesChanged }: SourcesPaneProps) {
+export function SourcesPane({ api, refreshKey, onSelectSource, selectedSourceId, enabledSourceIds, onToggleSource, onSetAllSources, onSourcesChanged }: SourcesPaneProps) {
   const [sources, setSources] = useState<Source[]>([]);
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds
     }
   };
 
-  useEffect(() => { fetchSources(); }, []);
+  useEffect(() => { fetchSources(); }, [refreshKey]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,6 +99,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds
   const sourceIcon = (type: string) => {
     switch (type) {
       case "docx": return "📄";
+      case "pdf": return "📑";
       case "sharepoint": return "🏢";
       case "paste": return "📋";
       case "vtt": return "🎙️";
@@ -113,7 +116,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds
         <label className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer text-sm font-medium transition-colors mb-2">
           <FileUp size={16} />
           Upload file
-          <input type="file" accept=".docx,.vtt" className="hidden" onChange={handleFileUpload} />
+          <input type="file" accept=".docx,.vtt,.pdf" className="hidden" onChange={handleFileUpload} />
         </label>
 
         {/* URL Input */}
@@ -136,7 +139,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds
           className="flex items-center gap-2 w-full px-3 py-1.5 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors"
         >
           <ClipboardPaste size={14} />
-          Paste content (SharePoint, etc.)
+          Paste copied text
         </button>
 
         {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
@@ -203,7 +206,7 @@ export function SourcesPane({ onSelectSource, selectedSourceId, enabledSourceIds
           </button>
         )}
         {sources.length === 0 && !loading && (
-          <p className="text-gray-500 text-sm text-center mt-8">No sources yet. Upload a document or add a URL.</p>
+          <p className="text-gray-500 text-sm text-center mt-8">No sources yet. Upload transcripts, public URL, or copied text.</p>
         )}
         {sources.map((source) => (
           <div
