@@ -1,4 +1,4 @@
-# TSS LLM — Trust and Security Services
+# AI Knowledge Notebook
 
 A collaborative, NotebookLLM-style web application with three panes for importing sources, asking AI-powered questions, and creating markdown artifacts.
 
